@@ -104,7 +104,6 @@
             // nemesisRadioButton
             // 
             this.nemesisRadioButton.AutoSize = true;
-            this.nemesisRadioButton.Enabled = false;
             this.nemesisRadioButton.Location = new System.Drawing.Point(190, 19);
             this.nemesisRadioButton.Name = "nemesisRadioButton";
             this.nemesisRadioButton.Size = new System.Drawing.Size(65, 17);

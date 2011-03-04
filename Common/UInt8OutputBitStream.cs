@@ -3,13 +3,13 @@
     using System;
     using System.IO;
 
-    public sealed class UInt16LEOutputBitStream : OutputBitStream<ushort>
+    public sealed class UInt8OutputBitStream : OutputBitStream<byte>
     {
         private Stream stream;
         private int waitingBits;
-        private ushort byteBuffer;
+        private byte byteBuffer;
 
-        public UInt16LEOutputBitStream(Stream stream)
+        public UInt8OutputBitStream(Stream stream)
         {
             this.stream = stream;
         }
@@ -17,10 +17,10 @@
         public override bool Put(bool bit)
         {
             this.byteBuffer <<= 1;
-            this.byteBuffer |= Convert.ToUInt16(bit);
-            if (++this.waitingBits >= 16)
+            this.byteBuffer |= Convert.ToByte(bit);
+            if (++this.waitingBits >= 8)
             {
-                LittleEndian.Write2(this.stream, this.byteBuffer);
+                NeutralEndian.Write1(this.stream, this.byteBuffer);
                 this.waitingBits = 0;
                 this.byteBuffer = 0;
                 return true;
@@ -31,10 +31,10 @@
 
         public override bool Push(bool bit)
         {
-            this.byteBuffer |= (ushort)(Convert.ToUInt16(bit) << this.waitingBits);
-            if (++this.waitingBits >= 16)
+            this.byteBuffer |= (byte)(Convert.ToByte(bit) << this.waitingBits);
+            if (++this.waitingBits >= 8)
             {
-                LittleEndian.Write2(this.stream, this.byteBuffer);
+                NeutralEndian.Write1(this.stream, this.byteBuffer);
                 this.waitingBits = 0;
                 this.byteBuffer = 0;
                 return true;
@@ -49,10 +49,10 @@
             {
                 if (!unchanged)
                 {
-                    this.byteBuffer <<= 16 - this.waitingBits;
+                    this.byteBuffer <<= 8 - this.waitingBits;
                 }
 
-                LittleEndian.Write2(this.stream, this.byteBuffer);
+                NeutralEndian.Write1(this.stream, this.byteBuffer);
                 this.waitingBits = 0;
                 return true;
             }
@@ -60,13 +60,13 @@
             return false;
         }
 
-        public override bool Write(ushort data, int size)
+        public override bool Write(byte data, int size)
         {
-            if (this.waitingBits + size >= 16)
+            if (this.waitingBits + size >= 8)
             {
-                int delta = 16 - this.waitingBits;
-                this.waitingBits = (this.waitingBits + size) % 16;
-                LittleEndian.Write2(this.stream, (ushort)((this.byteBuffer << delta) | (data >> this.waitingBits)));
+                int delta = 8 - this.waitingBits;
+                this.waitingBits = (this.waitingBits + size) % 8;
+                NeutralEndian.Write1(this.stream, (byte)((this.byteBuffer << delta) | (data >> this.waitingBits)));
                 this.byteBuffer = data;
                 return true;
             }

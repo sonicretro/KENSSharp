@@ -36,10 +36,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileSelector.cs">
@@ -88,6 +86,10 @@
     <ProjectReference Include="..\Kosinski\Kosinski.csproj">
       <Project>{57DC1B51-9D00-49E3-9D72-2AA53AA97F8F}</Project>
       <Name>Kosinski</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Nemesis\Nemesis.csproj">
+      <Project>{CF04DFA4-606B-48E6-B43A-4948C98E8740}</Project>
+      <Name>Nemesis</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -90,7 +90,7 @@
                 }
                 else if (this.nemesisRadioButton.Checked)
                 {
-
+                    Nemesis.Decompress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName);
                 }
                 else if (this.enigmaRadioButton.Checked)
                 {
