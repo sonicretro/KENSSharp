@@ -110,15 +110,16 @@
             // We will solve the Coin Collector's problem several times, each time
             // ignoring more of the least frequent nibble runs. This allows us to find
             // *the* lowest file size.
-            for (int i = 0; i < qt.Count - 1; i++)
+            while (qt.Count > 1)
             {
                 // Make a copy of the basic coin collection.
                 var q0 = new List<EncodingCodeTreeNode>(qt);
 
-                // Ignore the lowest weighted items. Could probably be sped up by doing
-                // a binary search if it can be proven that there is a single global
-                // minimum and no local minima for file size.
-                q0.RemoveRange(q0.Count - i, i);
+                // Ignore the lowest weighted item. Will only affect the next iteration
+                // of the loop. If it can be proven that there is a single global
+                // minimum (and no local minima for file size), then this could be
+                // simplified to a binary search.
+                qt.RemoveAt(qt.Count - 1);
 
                 // We now solve the Coin collector's problem using the Package-merge
                 // algorithm. The solution goes here.
@@ -285,9 +286,6 @@
 
                 // Round up to a full byte.
                 tempsize_est = (tempsize_est + 7) & ~7;
-
-                // Round up to even size.
-                tempsize_est += tempsize_est & 1;
 
                 // Is this iteration better than the best?
                 if (tempsize_est < sizeEstimate)
