@@ -15,7 +15,6 @@
         private long alignment;
         private long offset;
         private PaddedStreamMode mode;
-        private int powerOfTwoBit;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PaddedStream" /> class with the specified underlying stream.
@@ -45,24 +44,6 @@
             this.stream = stream;
             this.alignment = alignment;
             this.mode = mode;
-            this.powerOfTwoBit = -1;
-
-            // Determine if the specified alignment is a power of two
-            if ((alignment & (alignment - 1)) == 0)
-            {
-                // Find what power of two, and remember the bit position, such that the original alignment can be computed as
-                // alignment = 1L << powerOfTwoBit.
-                int i;
-                long powerOfTwo;
-                for (i = 0, powerOfTwo = 1; powerOfTwo != 0; i++, powerOfTwo <<= 1)
-                {
-                    if (alignment == powerOfTwo)
-                    {
-                        this.powerOfTwoBit = i;
-                        break;
-                    }
-                }
-            }
         }
 
         public override bool CanRead
@@ -298,10 +279,13 @@
         /// </returns>
         private long AlignedLength(long length)
         {
-            if (this.powerOfTwoBit >= 0)
+            long alignmentMinusOne = this.alignment - 1;
+
+            // If this.alignment is a power of two...
+            if ((this.alignment & alignmentMinusOne) == 0)
             {
-                long n = (1L << this.powerOfTwoBit) - 1;
-                return (length + n) & ~n;
+                // ...then we can use a faster algorithm.
+                return (length + alignmentMinusOne) & ~alignmentMinusOne;
             }
 
             return (length + (this.alignment - 1)) / this.alignment * this.alignment;

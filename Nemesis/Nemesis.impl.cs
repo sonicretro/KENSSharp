@@ -118,7 +118,6 @@
                 // Ignore the lowest weighted items. Could probably be sped up by doing
                 // a binary search if it can be proven that there is a single global
                 // minimum and no local minima for file size.
-                // TODO: check if it's in the right order
                 q0.RemoveRange(q0.Count - i, i);
 
                 // We now solve the Coin collector's problem using the Package-merge
