@@ -53,8 +53,20 @@
 
         public static void Decompress(Stream input, Stream output, bool moduled)
         {
+            if (input == null)
+            {
+                throw new ArgumentNullException("input");
+            }
+
+            if (output == null)
+            {
+                throw new ArgumentNullException("output");
+            }
+
             if (!Decode(input, output, 0, moduled))
+            {
                 throw new CompressionException("Decompression failed!");
+            }
         }
 
         public static byte[] Compress(string sourceFilePath, bool moduled)
@@ -105,8 +117,20 @@
 
         public static void Compress(Stream input, Stream output, bool moduled)
         {
+            if (input == null)
+            {
+                throw new ArgumentNullException("input");
+            }
+
+            if (output == null)
+            {
+                throw new ArgumentNullException("output");
+            }
+
             if (!Encode(input, output, moduled))
+            {
                 throw new CompressionException("Compression failed!");
+            }
         }
     }
 }

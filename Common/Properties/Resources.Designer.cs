@@ -61,74 +61,47 @@ namespace SonicRetro.KensSharp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A bit code is already used as a prefix for other codes..
+        ///   Looks up a localized string similar to SonicRetro.KensSharp.PaddedStream.Flush can only be called on streams in write mode..
         /// </summary>
-        internal static string CodeAlreadyUsedAsPrefix {
+        internal static string PaddedStreamFlushRequiresWriteMode {
             get {
-                return ResourceManager.GetString("CodeAlreadyUsedAsPrefix", resourceCulture);
+                return ResourceManager.GetString("PaddedStreamFlushRequiresWriteMode", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A sequence of bits results in a code that isn&apos;t defined in the code tree..
+        ///   Looks up a localized string similar to SonicRetro.KensSharp.PaddedStream.Read can only be called on streams in read mode..
         /// </summary>
-        internal static string InvalidCode {
+        internal static string PaddedStreamReadRequiresReadMode {
             get {
-                return ResourceManager.GetString("InvalidCode", resourceCulture);
+                return ResourceManager.GetString("PaddedStreamReadRequiresReadMode", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;count&apos; is negative..
+        ///   Looks up a localized string similar to The specified offset points to before the start of the stream..
         /// </summary>
-        internal static string NegativeCount {
+        internal static string PaddedStreamSeekToBeforeStartOfStream {
             get {
-                return ResourceManager.GetString("NegativeCount", resourceCulture);
+                return ResourceManager.GetString("PaddedStreamSeekToBeforeStartOfStream", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;offset&apos; is negative..
+        ///   Looks up a localized string similar to SonicRetro.KensSharp.PaddedStream.SetLength can only be called on streams in write mode..
         /// </summary>
-        internal static string NegativeOffset {
+        internal static string PaddedStreamSetLengthRequiresWriteMode {
             get {
-                return ResourceManager.GetString("NegativeOffset", resourceCulture);
+                return ResourceManager.GetString("PaddedStreamSetLengthRequiresWriteMode", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;offset&apos; is greater than the size of &apos;buffer&apos;..
+        ///   Looks up a localized string similar to SonicRetro.KensSharp.PaddedStream.Write can only be called on streams in write mode..
         /// </summary>
-        internal static string OffsetIsGreaterThanBufferSize {
+        internal static string PaddedStreamWriteRequiresWriteMode {
             get {
-                return ResourceManager.GetString("OffsetIsGreaterThanBufferSize", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The sum of &apos;offset&apos; and &apos;count&apos; is greater than the size of &apos;buffer&apos;..
-        /// </summary>
-        internal static string OffsetPlusCountIsGreaterThanBufferSize {
-            get {
-                return ResourceManager.GetString("OffsetPlusCountIsGreaterThanBufferSize", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A bit code prefix is already used for a complete bit code..
-        /// </summary>
-        internal static string PrefixAlreadyUsedAsCode {
-            get {
-                return ResourceManager.GetString("PrefixAlreadyUsedAsCode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The remaining length of the specified input stream is greater than Int32.MaxValue (0x7fffffff)..
-        /// </summary>
-        internal static string StreamIsTooLong {
-            get {
-                return ResourceManager.GetString("StreamIsTooLong", resourceCulture);
+                return ResourceManager.GetString("PaddedStreamWriteRequiresWriteMode", resourceCulture);
             }
         }
     }

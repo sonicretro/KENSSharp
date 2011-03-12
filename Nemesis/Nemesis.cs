@@ -53,11 +53,22 @@
 
         public static void Decompress(Stream input, Stream output)
         {
+            if (input == null)
+            {
+                throw new ArgumentNullException("input");
+            }
+
+            if (output == null)
+            {
+                throw new ArgumentNullException("output");
+            }
+
             if (!Decode(input, output))
+            {
                 throw new CompressionException("Decompression failed!");
+            }
         }
 
-#if false
         public static byte[] Compress(string sourceFilePath)
         {
             using (FileStream input = File.OpenRead(sourceFilePath))
@@ -106,9 +117,20 @@
 
         public static void Compress(Stream input, Stream output)
         {
+            if (input == null)
+            {
+                throw new ArgumentNullException("input");
+            }
+
+            if (output == null)
+            {
+                throw new ArgumentNullException("output");
+            }
+
             if (!Encode(input, output))
+            {
                 throw new CompressionException("Compression failed!");
+            }
         }
-#endif
     }
 }
