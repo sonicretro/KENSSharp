@@ -154,7 +154,6 @@
                     {
                         FlushBuffer(buf, bitStream, writeBitfield, packetLength);
                         ushort count = 1;
-                        ushort prev = next;
                         next = (ushort)(next + delta);
                         for (int i = pos + 2; i < words.Length && count < 0xf; i++)
                         {
@@ -163,7 +162,9 @@
                                 break;
                             }
 
-                            if (delta == 1 && prev == incrementingValue)
+                            // If the word is equal to the incrementing word value, stop this run early so we can use the
+                            // incrementing value in the next iteration of the main loop.
+                            if (words[i] == incrementingValue)
                             {
                                 break;
                             }
