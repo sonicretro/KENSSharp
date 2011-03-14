@@ -1,5 +1,6 @@
 ﻿namespace SonicRetro.KensSharp
 {
+    using System;
     using System.IO;
 
     public sealed class UInt16LEInputBitStream : InputBitStream<ushort>
@@ -10,6 +11,11 @@
 
         public UInt16LEInputBitStream(Stream stream)
         {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
             this.stream = stream;
             this.remainingBits = 16;
             this.byteBuffer = LittleEndian.Read2(stream);

@@ -6,13 +6,13 @@
 
     public static partial class Kosinski
     {
-        private static bool Encode(Stream source, Stream destination, bool moduled)
+        private static void Encode(Stream source, Stream destination, bool moduled)
         {
-            return Encode(source, destination, 8192, 256, moduled);
+            Encode(source, destination, 8192, 256, moduled);
         }
 
         [SecuritySafeCritical]
-        private static unsafe bool Encode(Stream source, Stream destination, long slidingWindow, long recLength, bool moduled)
+        private static unsafe void Encode(Stream source, Stream destination, long slidingWindow, long recLength, bool moduled)
         {
             long size = source.Length;
             source.Seek(0, SeekOrigin.Begin);
@@ -26,7 +26,7 @@
                 {
                     if (size > 0xffff)
                     {
-                        return false;
+                        throw new CompressionException(Properties.Resources.KosinskiTotalSizeTooLarge);
                     }
 
                     long remainingSize = size;
@@ -66,8 +66,6 @@
                     EncodeInternal(destination, ptr, slidingWindow, recLength, size);
                 }
             }
-
-            return true;
         }
 
         [SecurityCritical]
@@ -170,11 +168,9 @@
             }
         }
 
-        private static bool Decode(Stream source, Stream destination, long location, bool moduled)
+        private static void Decode(Stream source, Stream destination, bool moduled)
         {
             long decompressedBytes = 0;
-            source.Seek(location, SeekOrigin.Begin);
-
             if (moduled)
             {
                 long fullSize = BigEndian.Read2(source);
@@ -205,8 +201,6 @@
             {
                 DecodeInternal(source, destination, ref decompressedBytes);
             }
-
-            return true;
         }
 
         private static void DecodeInternal(Stream source, Stream destination, ref long decompressedBytes)

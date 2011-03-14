@@ -117,22 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CompressionExceptionDefaultMessage" xml:space="preserve">
-    <value>An error occurred during compression or decompression.</value>
-  </data>
-  <data name="PaddedStreamFlushRequiresWriteMode" xml:space="preserve">
-    <value>SonicRetro.KensSharp.PaddedStream.Flush can only be called on streams in write mode.</value>
-  </data>
-  <data name="PaddedStreamReadRequiresReadMode" xml:space="preserve">
-    <value>SonicRetro.KensSharp.PaddedStream.Read can only be called on streams in read mode.</value>
-  </data>
-  <data name="PaddedStreamSeekToBeforeStartOfStream" xml:space="preserve">
-    <value>The specified offset points to before the start of the stream.</value>
-  </data>
-  <data name="PaddedStreamSetLengthRequiresWriteMode" xml:space="preserve">
-    <value>SonicRetro.KensSharp.PaddedStream.SetLength can only be called on streams in write mode.</value>
-  </data>
-  <data name="PaddedStreamWriteRequiresWriteMode" xml:space="preserve">
-    <value>SonicRetro.KensSharp.PaddedStream.Write can only be called on streams in write mode.</value>
+  <data name="EmptySource" xml:space="preserve">
+    <value>The source data for compression is empty.</value>
   </data>
 </root>

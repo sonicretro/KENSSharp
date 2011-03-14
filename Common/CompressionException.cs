@@ -13,6 +13,7 @@
         /// Initializes a new instance of the <see cref="CompressionException"/> class.
         /// </summary>
         public CompressionException()
+            : base(Properties.Resources.CompressionExceptionDefaultMessage)
         {
         }
 

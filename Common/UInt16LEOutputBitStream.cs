@@ -11,6 +11,11 @@
 
         public UInt16LEOutputBitStream(Stream stream)
         {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
             this.stream = stream;
         }
 

@@ -61,56 +61,11 @@ namespace SonicRetro.KensSharp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error occurred during compression or decompression..
+        ///   Looks up a localized string similar to The source data for compression is empty..
         /// </summary>
-        internal static string CompressionExceptionDefaultMessage {
+        internal static string EmptySource {
             get {
-                return ResourceManager.GetString("CompressionExceptionDefaultMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SonicRetro.KensSharp.PaddedStream.Flush can only be called on streams in write mode..
-        /// </summary>
-        internal static string PaddedStreamFlushRequiresWriteMode {
-            get {
-                return ResourceManager.GetString("PaddedStreamFlushRequiresWriteMode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SonicRetro.KensSharp.PaddedStream.Read can only be called on streams in read mode..
-        /// </summary>
-        internal static string PaddedStreamReadRequiresReadMode {
-            get {
-                return ResourceManager.GetString("PaddedStreamReadRequiresReadMode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified offset points to before the start of the stream..
-        /// </summary>
-        internal static string PaddedStreamSeekToBeforeStartOfStream {
-            get {
-                return ResourceManager.GetString("PaddedStreamSeekToBeforeStartOfStream", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SonicRetro.KensSharp.PaddedStream.SetLength can only be called on streams in write mode..
-        /// </summary>
-        internal static string PaddedStreamSetLengthRequiresWriteMode {
-            get {
-                return ResourceManager.GetString("PaddedStreamSetLengthRequiresWriteMode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SonicRetro.KensSharp.PaddedStream.Write can only be called on streams in write mode..
-        /// </summary>
-        internal static string PaddedStreamWriteRequiresWriteMode {
-            get {
-                return ResourceManager.GetString("PaddedStreamWriteRequiresWriteMode", resourceCulture);
+                return ResourceManager.GetString("EmptySource", resourceCulture);
             }
         }
     }

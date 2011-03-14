@@ -81,7 +81,6 @@
             // enigmaRadioButton
             // 
             this.enigmaRadioButton.AutoSize = true;
-            this.enigmaRadioButton.Enabled = false;
             this.enigmaRadioButton.Location = new System.Drawing.Point(261, 19);
             this.enigmaRadioButton.Name = "enigmaRadioButton";
             this.enigmaRadioButton.Size = new System.Drawing.Size(60, 17);

@@ -75,7 +75,7 @@
                 }
                 else if (this.enigmaRadioButton.Checked)
                 {
-
+                    Enigma.Compress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName, Endianness.BigEndian);
                 }
             }
             else if (this.decompressRadioButton.Checked)
@@ -94,7 +94,7 @@
                 }
                 else if (this.enigmaRadioButton.Checked)
                 {
-
+                    Enigma.Decompress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName, Endianness.BigEndian);
                 }
             }
         }
