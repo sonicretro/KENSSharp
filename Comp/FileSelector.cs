@@ -17,6 +17,8 @@ namespace SonicRetro.KensSharp.Comp
     /// </summary>
     public partial class FileSelector : UserControl, ISupportInitialize
     {
+        private static readonly object EventFileNameChanged = new object();
+
         private FileDialog fileDialog;
         private InitializationValues init;
 
@@ -26,7 +28,24 @@ namespace SonicRetro.KensSharp.Comp
         public FileSelector()
         {
             this.InitializeComponent();
+            this.fileNameTextBox.TextChanged += this.fileNameTextBox_TextChanged;
             this.fileDialog = new OpenFileDialog();
+        }
+
+        /// <summary>
+        /// Occurs when the <see cref="FileName"/> property value changes.
+        /// </summary>
+        public event EventHandler FileNameChanged
+        {
+            add
+            {
+                this.Events.AddHandler(EventFileNameChanged, value);
+            }
+
+            remove
+            {
+                this.Events.RemoveHandler(EventFileNameChanged, value);
+            }
         }
 
         /// <summary>
@@ -94,11 +113,16 @@ namespace SonicRetro.KensSharp.Comp
 
             set
             {
-                this.fileNameTextBox.Text = value;
-
-                if (this.init == null)
+                if (this.fileNameTextBox.Text != value)
                 {
-                    this.fileDialog.FileName = value;
+                    this.fileNameTextBox.Text = value;
+
+                    if (this.init == null)
+                    {
+                        this.fileDialog.FileName = value;
+                    }
+
+                    this.OnFileNameChanged(new EventArgs());
                 }
             }
         }
@@ -188,6 +212,9 @@ namespace SonicRetro.KensSharp.Comp
             }
         }
 
+        /// <summary>
+        /// Signals the <see cref="FileSelector"/> that initialization is starting.
+        /// </summary>
         public void BeginInit()
         {
             if (this.init != null)
@@ -198,6 +225,9 @@ namespace SonicRetro.KensSharp.Comp
             this.init = new InitializationValues();
         }
 
+        /// <summary>
+        /// Signals the <see cref="FileSelector"/> that initialization is complete.
+        /// </summary>
         public void EndInit()
         {
             if (this.init == null)
@@ -256,10 +286,29 @@ namespace SonicRetro.KensSharp.Comp
                 {
                     this.fileNameTextBox.Text = dataAsStringArray[0];
                     this.fileDialog.FileName = dataAsStringArray[0];
+                    this.OnFileNameChanged(new EventArgs());
                 }
             }
 
             base.OnDragDrop(drgevent);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="FileNameChanged"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        protected virtual void OnFileNameChanged(EventArgs e)
+        {
+            EventHandler handler = this.Events[EventFileNameChanged] as EventHandler;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        private void fileNameTextBox_TextChanged(object sender, EventArgs e)
+        {
+            this.OnFileNameChanged(new EventArgs());
         }
 
         private void browseButton_Click(object sender, EventArgs e)

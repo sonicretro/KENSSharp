@@ -28,24 +28,24 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.destinationLabel = new System.Windows.Forms.Label();
             this.sourceLabel = new System.Windows.Forms.Label();
             this.goButton = new System.Windows.Forms.Button();
-            this.enigmaRadioButton = new System.Windows.Forms.RadioButton();
             this.compressRadioButton = new System.Windows.Forms.RadioButton();
-            this.nemesisRadioButton = new System.Windows.Forms.RadioButton();
-            this.moduledKosinskiRadioButton = new System.Windows.Forms.RadioButton();
-            this.kosinskiRadioButton = new System.Windows.Forms.RadioButton();
             this.modeGroupBox = new System.Windows.Forms.GroupBox();
             this.decompressRadioButton = new System.Windows.Forms.RadioButton();
             this.formatGroupBox = new System.Windows.Forms.GroupBox();
-            this.errorProvider = new System.Windows.Forms.ErrorProvider(this.components);
+            this.formatListBox = new System.Windows.Forms.ListBox();
+            this.parametersGroupBox = new System.Windows.Forms.GroupBox();
+            this.sizeParameterHexCheckBox = new System.Windows.Forms.CheckBox();
+            this.sizeParameterNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.sizeParameterLabel = new System.Windows.Forms.Label();
             this.sourceFileSelector = new SonicRetro.KensSharp.Comp.FileSelector();
             this.destinationFileSelector = new SonicRetro.KensSharp.Comp.FileSelector();
             this.modeGroupBox.SuspendLayout();
             this.formatGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.errorProvider)).BeginInit();
+            this.parametersGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.sizeParameterNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sourceFileSelector)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.destinationFileSelector)).BeginInit();
             this.SuspendLayout();
@@ -53,89 +53,53 @@
             // destinationLabel
             // 
             this.destinationLabel.AutoSize = true;
-            this.destinationLabel.Location = new System.Drawing.Point(12, 94);
+            this.destinationLabel.Location = new System.Drawing.Point(150, 99);
             this.destinationLabel.Name = "destinationLabel";
             this.destinationLabel.Size = new System.Drawing.Size(65, 13);
-            this.destinationLabel.TabIndex = 4;
-            this.destinationLabel.Text = "D&estination:";
+            this.destinationLabel.TabIndex = 5;
+            this.destinationLabel.Text = "&Destination:";
             // 
             // sourceLabel
             // 
             this.sourceLabel.AutoSize = true;
-            this.sourceLabel.Location = new System.Drawing.Point(12, 65);
+            this.sourceLabel.Location = new System.Drawing.Point(150, 70);
             this.sourceLabel.Name = "sourceLabel";
             this.sourceLabel.Size = new System.Drawing.Size(44, 13);
-            this.sourceLabel.TabIndex = 2;
+            this.sourceLabel.TabIndex = 3;
             this.sourceLabel.Text = "&Source:";
             // 
             // goButton
             // 
-            this.goButton.Location = new System.Drawing.Point(444, 60);
+            this.goButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.goButton.Enabled = false;
+            this.goButton.Location = new System.Drawing.Point(498, 65);
             this.goButton.Name = "goButton";
             this.goButton.Size = new System.Drawing.Size(74, 54);
-            this.goButton.TabIndex = 6;
+            this.goButton.TabIndex = 7;
             this.goButton.Text = "Go";
             this.goButton.UseVisualStyleBackColor = true;
             this.goButton.Click += new System.EventHandler(this.goButton_Click);
-            // 
-            // enigmaRadioButton
-            // 
-            this.enigmaRadioButton.AutoSize = true;
-            this.enigmaRadioButton.Location = new System.Drawing.Point(261, 19);
-            this.enigmaRadioButton.Name = "enigmaRadioButton";
-            this.enigmaRadioButton.Size = new System.Drawing.Size(60, 17);
-            this.enigmaRadioButton.TabIndex = 3;
-            this.enigmaRadioButton.TabStop = true;
-            this.enigmaRadioButton.Text = "&Enigma";
             // 
             // compressRadioButton
             // 
             this.compressRadioButton.AutoSize = true;
             this.compressRadioButton.Checked = true;
-            this.compressRadioButton.Location = new System.Drawing.Point(6, 19);
+            this.compressRadioButton.Location = new System.Drawing.Point(6, 20);
             this.compressRadioButton.Name = "compressRadioButton";
             this.compressRadioButton.Size = new System.Drawing.Size(71, 17);
             this.compressRadioButton.TabIndex = 0;
             this.compressRadioButton.TabStop = true;
             this.compressRadioButton.Text = "&Compress";
             this.compressRadioButton.UseVisualStyleBackColor = true;
-            // 
-            // nemesisRadioButton
-            // 
-            this.nemesisRadioButton.AutoSize = true;
-            this.nemesisRadioButton.Location = new System.Drawing.Point(190, 19);
-            this.nemesisRadioButton.Name = "nemesisRadioButton";
-            this.nemesisRadioButton.Size = new System.Drawing.Size(65, 17);
-            this.nemesisRadioButton.TabIndex = 2;
-            this.nemesisRadioButton.Text = "&Nemesis";
-            // 
-            // moduledKosinskiRadioButton
-            // 
-            this.moduledKosinskiRadioButton.AutoSize = true;
-            this.moduledKosinskiRadioButton.Location = new System.Drawing.Point(76, 19);
-            this.moduledKosinskiRadioButton.Name = "moduledKosinskiRadioButton";
-            this.moduledKosinskiRadioButton.Size = new System.Drawing.Size(108, 17);
-            this.moduledKosinskiRadioButton.TabIndex = 1;
-            this.moduledKosinskiRadioButton.Text = "&Moduled Kosinski";
-            // 
-            // kosinskiRadioButton
-            // 
-            this.kosinskiRadioButton.AutoSize = true;
-            this.kosinskiRadioButton.Checked = true;
-            this.kosinskiRadioButton.Location = new System.Drawing.Point(6, 19);
-            this.kosinskiRadioButton.Name = "kosinskiRadioButton";
-            this.kosinskiRadioButton.Size = new System.Drawing.Size(64, 17);
-            this.kosinskiRadioButton.TabIndex = 0;
-            this.kosinskiRadioButton.TabStop = true;
-            this.kosinskiRadioButton.Text = "&Kosinski";
+            this.compressRadioButton.CheckedChanged += new System.EventHandler(this.modeRadioButton_CheckedChanged);
             // 
             // modeGroupBox
             // 
             this.modeGroupBox.Controls.Add(this.compressRadioButton);
             this.modeGroupBox.Controls.Add(this.decompressRadioButton);
-            this.modeGroupBox.Location = new System.Drawing.Point(345, 12);
+            this.modeGroupBox.Location = new System.Drawing.Point(150, 12);
             this.modeGroupBox.Name = "modeGroupBox";
-            this.modeGroupBox.Size = new System.Drawing.Size(173, 42);
+            this.modeGroupBox.Size = new System.Drawing.Size(173, 43);
             this.modeGroupBox.TabIndex = 1;
             this.modeGroupBox.TabStop = false;
             this.modeGroupBox.Text = "Mode";
@@ -143,56 +107,119 @@
             // decompressRadioButton
             // 
             this.decompressRadioButton.AutoSize = true;
-            this.decompressRadioButton.Location = new System.Drawing.Point(83, 19);
+            this.decompressRadioButton.Location = new System.Drawing.Point(84, 20);
             this.decompressRadioButton.Name = "decompressRadioButton";
             this.decompressRadioButton.Size = new System.Drawing.Size(84, 17);
             this.decompressRadioButton.TabIndex = 1;
             this.decompressRadioButton.TabStop = true;
             this.decompressRadioButton.Text = "&Decompress";
+            this.decompressRadioButton.CheckedChanged += new System.EventHandler(this.modeRadioButton_CheckedChanged);
             // 
             // formatGroupBox
             // 
-            this.formatGroupBox.Controls.Add(this.kosinskiRadioButton);
-            this.formatGroupBox.Controls.Add(this.moduledKosinskiRadioButton);
-            this.formatGroupBox.Controls.Add(this.nemesisRadioButton);
-            this.formatGroupBox.Controls.Add(this.enigmaRadioButton);
+            this.formatGroupBox.Controls.Add(this.formatListBox);
             this.formatGroupBox.Location = new System.Drawing.Point(12, 12);
             this.formatGroupBox.Name = "formatGroupBox";
-            this.formatGroupBox.Size = new System.Drawing.Size(327, 42);
+            this.formatGroupBox.Size = new System.Drawing.Size(132, 108);
             this.formatGroupBox.TabIndex = 0;
             this.formatGroupBox.TabStop = false;
             this.formatGroupBox.Text = "Format";
             // 
-            // errorProvider
+            // formatListBox
             // 
-            this.errorProvider.ContainerControl = this;
+            this.formatListBox.Items.AddRange(new object[] {
+            "Kosinski",
+            "Moduled Kosinski",
+            "Enigma",
+            "Nemesis",
+            "Saxman (with size)",
+            "Saxman (without size)"});
+            this.formatListBox.Location = new System.Drawing.Point(6, 20);
+            this.formatListBox.Name = "formatListBox";
+            this.formatListBox.Size = new System.Drawing.Size(120, 82);
+            this.formatListBox.TabIndex = 0;
+            this.formatListBox.SelectedIndexChanged += new System.EventHandler(this.formatListBox_SelectedIndexChanged);
+            // 
+            // parametersGroupBox
+            // 
+            this.parametersGroupBox.Controls.Add(this.sizeParameterHexCheckBox);
+            this.parametersGroupBox.Controls.Add(this.sizeParameterNumericUpDown);
+            this.parametersGroupBox.Controls.Add(this.sizeParameterLabel);
+            this.parametersGroupBox.Location = new System.Drawing.Point(329, 12);
+            this.parametersGroupBox.Name = "parametersGroupBox";
+            this.parametersGroupBox.Size = new System.Drawing.Size(243, 47);
+            this.parametersGroupBox.TabIndex = 2;
+            this.parametersGroupBox.TabStop = false;
+            this.parametersGroupBox.Text = "Parameters";
+            // 
+            // sizeParameterHexCheckBox
+            // 
+            this.sizeParameterHexCheckBox.AutoSize = true;
+            this.sizeParameterHexCheckBox.Enabled = false;
+            this.sizeParameterHexCheckBox.Location = new System.Drawing.Point(192, 21);
+            this.sizeParameterHexCheckBox.Name = "sizeParameterHexCheckBox";
+            this.sizeParameterHexCheckBox.Size = new System.Drawing.Size(45, 17);
+            this.sizeParameterHexCheckBox.TabIndex = 2;
+            this.sizeParameterHexCheckBox.Text = "Hex";
+            this.sizeParameterHexCheckBox.UseVisualStyleBackColor = true;
+            this.sizeParameterHexCheckBox.CheckedChanged += new System.EventHandler(this.sizeParameterHexCheckBox_CheckedChanged);
+            // 
+            // sizeParameterNumericUpDown
+            // 
+            this.sizeParameterNumericUpDown.Enabled = false;
+            this.sizeParameterNumericUpDown.Location = new System.Drawing.Point(42, 20);
+            this.sizeParameterNumericUpDown.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.sizeParameterNumericUpDown.Name = "sizeParameterNumericUpDown";
+            this.sizeParameterNumericUpDown.Size = new System.Drawing.Size(144, 21);
+            this.sizeParameterNumericUpDown.TabIndex = 1;
+            // 
+            // sizeParameterLabel
+            // 
+            this.sizeParameterLabel.AutoSize = true;
+            this.sizeParameterLabel.Enabled = false;
+            this.sizeParameterLabel.Location = new System.Drawing.Point(6, 22);
+            this.sizeParameterLabel.Name = "sizeParameterLabel";
+            this.sizeParameterLabel.Size = new System.Drawing.Size(30, 13);
+            this.sizeParameterLabel.TabIndex = 0;
+            this.sizeParameterLabel.Text = "S&ize:";
             // 
             // sourceFileSelector
             // 
+            this.sourceFileSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.sourceFileSelector.DefaultExt = "bin";
             this.sourceFileSelector.FileName = "";
             this.sourceFileSelector.Filter = "All Files (*.*)|*.*";
-            this.sourceFileSelector.Location = new System.Drawing.Point(83, 60);
+            this.sourceFileSelector.Location = new System.Drawing.Point(221, 65);
             this.sourceFileSelector.Name = "sourceFileSelector";
-            this.sourceFileSelector.Size = new System.Drawing.Size(355, 24);
-            this.sourceFileSelector.TabIndex = 3;
+            this.sourceFileSelector.Size = new System.Drawing.Size(271, 24);
+            this.sourceFileSelector.TabIndex = 4;
+            this.sourceFileSelector.FileNameChanged += new System.EventHandler(this.fileSelector_FileNameChanged);
             // 
             // destinationFileSelector
             // 
+            this.destinationFileSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.destinationFileSelector.DefaultExt = "bin";
             this.destinationFileSelector.FileName = "";
             this.destinationFileSelector.Filter = "All Files (*.*)|*.*";
-            this.destinationFileSelector.Location = new System.Drawing.Point(83, 90);
+            this.destinationFileSelector.Location = new System.Drawing.Point(221, 95);
             this.destinationFileSelector.Mode = SonicRetro.KensSharp.Comp.FileSelectorMode.Save;
             this.destinationFileSelector.Name = "destinationFileSelector";
-            this.destinationFileSelector.Size = new System.Drawing.Size(355, 24);
-            this.destinationFileSelector.TabIndex = 5;
+            this.destinationFileSelector.Size = new System.Drawing.Size(271, 24);
+            this.destinationFileSelector.TabIndex = 6;
+            this.destinationFileSelector.FileNameChanged += new System.EventHandler(this.fileSelector_FileNameChanged);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(530, 126);
+            this.ClientSize = new System.Drawing.Size(584, 132);
+            this.Controls.Add(this.parametersGroupBox);
             this.Controls.Add(this.formatGroupBox);
             this.Controls.Add(this.modeGroupBox);
             this.Controls.Add(this.sourceLabel);
@@ -201,15 +228,15 @@
             this.Controls.Add(this.destinationFileSelector);
             this.Controls.Add(this.goButton);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "Comp";
             this.modeGroupBox.ResumeLayout(false);
             this.modeGroupBox.PerformLayout();
             this.formatGroupBox.ResumeLayout(false);
-            this.formatGroupBox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.errorProvider)).EndInit();
+            this.parametersGroupBox.ResumeLayout(false);
+            this.parametersGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.sizeParameterNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.sourceFileSelector)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.destinationFileSelector)).EndInit();
             this.ResumeLayout(false);
@@ -222,17 +249,17 @@
         private System.Windows.Forms.Label destinationLabel;
         private System.Windows.Forms.Label sourceLabel;
         private System.Windows.Forms.Button goButton;
-        private System.Windows.Forms.RadioButton enigmaRadioButton;
         private System.Windows.Forms.RadioButton compressRadioButton;
-        private System.Windows.Forms.RadioButton nemesisRadioButton;
-        private System.Windows.Forms.RadioButton moduledKosinskiRadioButton;
-        private System.Windows.Forms.RadioButton kosinskiRadioButton;
         private System.Windows.Forms.GroupBox modeGroupBox;
         private System.Windows.Forms.RadioButton decompressRadioButton;
         private System.Windows.Forms.GroupBox formatGroupBox;
         private FileSelector sourceFileSelector;
         private FileSelector destinationFileSelector;
-        private System.Windows.Forms.ErrorProvider errorProvider;
+        private System.Windows.Forms.ListBox formatListBox;
+        private System.Windows.Forms.GroupBox parametersGroupBox;
+        private System.Windows.Forms.Label sizeParameterLabel;
+        private System.Windows.Forms.NumericUpDown sizeParameterNumericUpDown;
+        private System.Windows.Forms.CheckBox sizeParameterHexCheckBox;
 
     }
 }

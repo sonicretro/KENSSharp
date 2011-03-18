@@ -99,6 +99,10 @@
       <Project>{CF04DFA4-606B-48E6-B43A-4948C98E8740}</Project>
       <Name>Nemesis</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Saxman\Saxman.csproj">
+      <Project>{2BB00C68-FAAB-443D-95D4-EEBEB26AE69C}</Project>
+      <Name>Saxman</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

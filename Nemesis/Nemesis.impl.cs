@@ -9,7 +9,7 @@
 
     public static partial class Nemesis
     {
-        private static bool Encode(Stream input, Stream output)
+        private static void Encode(Stream input, Stream output)
         {
             using (PaddedStream paddedInput = new PaddedStream(input, 32, PaddedStreamMode.Read))
             {
@@ -42,8 +42,6 @@
                     }
                 }
             }
-
-            return true;
         }
 
         private static void EncodeInternal(Stream input, Stream output, bool xor, long inputLength)
@@ -346,7 +344,7 @@
             bitStream.Flush(false);
         }
 
-        private static bool Decode(Stream input, Stream output)
+        private static void Decode(Stream input, Stream output)
         {
             DecodingCodeTreeNode codeTree = new DecodingCodeTreeNode();
             ushort numberOfTiles = BigEndian.Read2(input);
@@ -354,7 +352,6 @@
             numberOfTiles &= 0x7fff;
             DecodeHeader(input, output, codeTree);
             DecodeInternal(input, output, codeTree, numberOfTiles, xorOutput);
-            return true;
         }
 
         private static void DecodeHeader(Stream input, Stream output, DecodingCodeTreeNode codeTree)

@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nemesis", "Nemesis\Nemesis.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Enigma", "Enigma\Enigma.csproj", "{8CF574E9-61B2-4185-85D0-308CC3C116BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saxman", "Saxman\Saxman.csproj", "{2BB00C68-FAAB-443D-95D4-EEBEB26AE69C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{8CF574E9-61B2-4185-85D0-308CC3C116BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CF574E9-61B2-4185-85D0-308CC3C116BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CF574E9-61B2-4185-85D0-308CC3C116BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BB00C68-FAAB-443D-95D4-EEBEB26AE69C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BB00C68-FAAB-443D-95D4-EEBEB26AE69C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BB00C68-FAAB-443D-95D4-EEBEB26AE69C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BB00C68-FAAB-443D-95D4-EEBEB26AE69C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
