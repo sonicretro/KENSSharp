@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C# Express 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Comp", "Comp\Comp.csproj", "{17FEA149-6981-4FDB-A685-3530BF5C876F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend", "Frontend\Frontend.csproj", "{17FEA149-6981-4FDB-A685-3530BF5C876F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kosinski", "Kosinski\Kosinski.csproj", "{57DC1B51-9D00-49E3-9D72-2AA53AA97F8F}"
 EndProject
