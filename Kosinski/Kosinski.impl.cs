@@ -6,64 +6,74 @@
 
     public static partial class Kosinski
     {
-        private static void Encode(Stream source, Stream destination, bool moduled)
+        private const long SlidingWindow = 8192;
+        private const long RecurrenceLength = 256;
+
+        [SecuritySafeCritical]
+        internal static unsafe void Encode(Stream source, Stream destination)
         {
-            Encode(source, destination, 8192, 256, moduled);
+            long size = source.Length - source.Position;
+            byte[] buffer = new byte[size];
+            source.Read(buffer, 0, (int)size);
+
+            fixed (byte* ptr = buffer)
+            {
+                EncodeInternal(destination, ptr, SlidingWindow, RecurrenceLength, size);
+            }
         }
 
         [SecuritySafeCritical]
-        private static unsafe void Encode(Stream source, Stream destination, long slidingWindow, long recLength, bool moduled)
+        internal static unsafe void Encode(Stream source, Stream destination, Endianness headerEndianness)
         {
-            long size = source.Length;
-            source.Seek(0, SeekOrigin.Begin);
+            long size = source.Length - source.Position;
             byte[] buffer = new byte[size];
             source.Read(buffer, 0, (int)size);
 
             fixed (byte* fixedPtr = buffer)
             {
                 byte* ptr = fixedPtr;
-                if (moduled)
+                if (size > 0xffff)
                 {
-                    if (size > 0xffff)
-                    {
-                        throw new CompressionException(Properties.Resources.KosinskiTotalSizeTooLarge);
-                    }
+                    throw new CompressionException(Properties.Resources.KosinskiTotalSizeTooLarge);
+                }
 
-                    long remainingSize = size;
-                    long compBytes = 0;
+                long remainingSize = size;
+                long compBytes = 0;
 
-                    if (remainingSize > 0x1000)
-                    {
-                        remainingSize = 0x1000;
-                    }
+                if (remainingSize > 0x1000)
+                {
+                    remainingSize = 0x1000;
+                }
 
+                if (headerEndianness == Endianness.BigEndian)
+                {
                     BigEndian.Write2(destination, (ushort)size);
-
-                    for (;;)
-                    {
-                        EncodeInternal(destination, ptr, slidingWindow, recLength, remainingSize);
-
-                        compBytes += remainingSize;
-                        ptr += remainingSize;
-
-                        if (compBytes >= size)
-                        {
-                            break;
-                        }
-
-                        // Padding between modules
-                        int n = (int)(16 - (destination.Position - 2) % 16);
-                        for (int i = 0; i < n; i++)
-                        {
-                            destination.WriteByte(0);
-                        }
-
-                        remainingSize = Math.Min(0x1000L, size - compBytes);
-                    }
                 }
                 else
                 {
-                    EncodeInternal(destination, ptr, slidingWindow, recLength, size);
+                    LittleEndian.Write2(destination, (ushort)size);
+                }
+
+                for (;;)
+                {
+                    EncodeInternal(destination, ptr, SlidingWindow, RecurrenceLength, remainingSize);
+
+                    compBytes += remainingSize;
+                    ptr += remainingSize;
+
+                    if (compBytes >= size)
+                    {
+                        break;
+                    }
+
+                    // Padding between modules
+                    int n = (int)(16 - (destination.Position - 2) % 16);
+                    for (int i = 0; i < n; i++)
+                    {
+                        destination.WriteByte(0);
+                    }
+
+                    remainingSize = Math.Min(0x1000L, size - compBytes);
                 }
             }
         }
@@ -168,38 +178,46 @@
             }
         }
 
-        private static void Decode(Stream source, Stream destination, bool moduled)
+        internal static void Decode(Stream source, Stream destination)
         {
             long decompressedBytes = 0;
-            if (moduled)
+            DecodeInternal(source, destination, ref decompressedBytes);
+        }
+
+        internal static void Decode(Stream source, Stream destination, Endianness headerEndianness)
+        {
+            long decompressedBytes = 0;
+            long fullSize;
+            if (headerEndianness == Endianness.BigEndian)
             {
-                long fullSize = BigEndian.Read2(source);
-                for (;;)
-                {
-                    DecodeInternal(source, destination, ref decompressedBytes);
-                    if (decompressedBytes >= fullSize)
-                    {
-                        break;
-                    }
-
-                    // Skip null bytes
-                    int b;
-                    while ((b = source.ReadByte()) == 0)
-                    {
-                    }
-
-                    if (b == -1)
-                    {
-                        throw new EndOfStreamException();
-                    }
-
-                    // Position the stream back on the null
-                    source.Seek(-1, SeekOrigin.Current);
-                }
+                fullSize = BigEndian.Read2(source);
             }
             else
             {
+                fullSize = LittleEndian.Read2(source);
+            }
+
+            for (;;)
+            {
                 DecodeInternal(source, destination, ref decompressedBytes);
+                if (decompressedBytes >= fullSize)
+                {
+                    break;
+                }
+
+                // Skip null bytes
+                int b;
+                while ((b = source.ReadByte()) == 0)
+                {
+                }
+
+                if (b == -1)
+                {
+                    throw new EndOfStreamException();
+                }
+
+                // Position the stream back on the null
+                source.Seek(-1, SeekOrigin.Current);
             }
         }
 

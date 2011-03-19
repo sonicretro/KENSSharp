@@ -8,8 +8,8 @@
     <ProjectGuid>{17FEA149-6981-4FDB-A685-3530BF5C876F}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SonicRetro.KensSharp.Comp</RootNamespace>
-    <AssemblyName>Comp</AssemblyName>
+    <RootNamespace>SonicRetro.KensSharp.Frontend</RootNamespace>
+    <AssemblyName>KensSharpFrontend</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>

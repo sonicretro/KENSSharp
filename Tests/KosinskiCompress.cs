@@ -28,35 +28,35 @@
         [TestCase]
         public static void TestOneByte()
         {
-            byte[] output = Kosinski.Compress(OneByteTestInput, false);
+            byte[] output = Kosinski.Compress(OneByteTestInput);
             CollectionAssert.AreEqual(OneByteTestOutput, output);
         }
 
         [TestCase]
         public static void TestTwoIdenticalBytes()
         {
-            byte[] output = Kosinski.Compress(TwoIdenticalBytesTestInput, false);
+            byte[] output = Kosinski.Compress(TwoIdenticalBytesTestInput);
             CollectionAssert.AreEqual(TwoIdenticalBytesTestOutput, output);
         }
 
         [TestCase]
         public static void TestTwoDifferentBytes()
         {
-            byte[] output = Kosinski.Compress(TwoDifferentBytesTestInput, false);
+            byte[] output = Kosinski.Compress(TwoDifferentBytesTestInput);
             CollectionAssert.AreEqual(TwoDifferentBytesTestOutput, output);
         }
 
         [TestCase]
         public static void TestSixteenIdenticalBytes()
         {
-            byte[] output = Kosinski.Compress(SixteenIdenticalBytesTestInput, false);
+            byte[] output = Kosinski.Compress(SixteenIdenticalBytesTestInput);
             CollectionAssert.AreEqual(SixteenIdenticalBytesTestOutput, output);
         }
 
         [TestCase]
         public static void TestSixteenDifferentBytes()
         {
-            byte[] output = Kosinski.Compress(SixteenDifferentBytesTestInput, false);
+            byte[] output = Kosinski.Compress(SixteenDifferentBytesTestInput);
             CollectionAssert.AreEqual(SixteenDifferentBytesTestOutput, output);
         }
     }

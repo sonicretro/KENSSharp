@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SonicRetro.KensSharp.Comp.Properties {
+namespace SonicRetro.KensSharp.Frontend.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace SonicRetro.KensSharp.Comp.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SonicRetro.KensSharp.Comp.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SonicRetro.KensSharp.Frontend.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

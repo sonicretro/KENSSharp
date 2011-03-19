@@ -1,4 +1,4 @@
-﻿namespace SonicRetro.KensSharp.Comp
+﻿namespace SonicRetro.KensSharp.Frontend
 {
     partial class MainForm
     {
@@ -40,8 +40,10 @@
             this.sizeParameterHexCheckBox = new System.Windows.Forms.CheckBox();
             this.sizeParameterNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.sizeParameterLabel = new System.Windows.Forms.Label();
-            this.sourceFileSelector = new SonicRetro.KensSharp.Comp.FileSelector();
-            this.destinationFileSelector = new SonicRetro.KensSharp.Comp.FileSelector();
+            this.endiannessLabel = new System.Windows.Forms.Label();
+            this.endiannessComboBox = new System.Windows.Forms.ComboBox();
+            this.sourceFileSelector = new SonicRetro.KensSharp.Frontend.FileSelector();
+            this.destinationFileSelector = new SonicRetro.KensSharp.Frontend.FileSelector();
             this.modeGroupBox.SuspendLayout();
             this.formatGroupBox.SuspendLayout();
             this.parametersGroupBox.SuspendLayout();
@@ -53,7 +55,7 @@
             // destinationLabel
             // 
             this.destinationLabel.AutoSize = true;
-            this.destinationLabel.Location = new System.Drawing.Point(150, 99);
+            this.destinationLabel.Location = new System.Drawing.Point(150, 126);
             this.destinationLabel.Name = "destinationLabel";
             this.destinationLabel.Size = new System.Drawing.Size(65, 13);
             this.destinationLabel.TabIndex = 5;
@@ -62,7 +64,7 @@
             // sourceLabel
             // 
             this.sourceLabel.AutoSize = true;
-            this.sourceLabel.Location = new System.Drawing.Point(150, 70);
+            this.sourceLabel.Location = new System.Drawing.Point(150, 97);
             this.sourceLabel.Name = "sourceLabel";
             this.sourceLabel.Size = new System.Drawing.Size(44, 13);
             this.sourceLabel.TabIndex = 3;
@@ -72,7 +74,7 @@
             // 
             this.goButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.goButton.Enabled = false;
-            this.goButton.Location = new System.Drawing.Point(498, 65);
+            this.goButton.Location = new System.Drawing.Point(498, 92);
             this.goButton.Name = "goButton";
             this.goButton.Size = new System.Drawing.Size(74, 54);
             this.goButton.TabIndex = 7;
@@ -86,7 +88,7 @@
             this.compressRadioButton.Checked = true;
             this.compressRadioButton.Location = new System.Drawing.Point(6, 20);
             this.compressRadioButton.Name = "compressRadioButton";
-            this.compressRadioButton.Size = new System.Drawing.Size(71, 17);
+            this.compressRadioButton.Size = new System.Drawing.Size(72, 17);
             this.compressRadioButton.TabIndex = 0;
             this.compressRadioButton.TabStop = true;
             this.compressRadioButton.Text = "&Compress";
@@ -109,7 +111,7 @@
             this.decompressRadioButton.AutoSize = true;
             this.decompressRadioButton.Location = new System.Drawing.Point(84, 20);
             this.decompressRadioButton.Name = "decompressRadioButton";
-            this.decompressRadioButton.Size = new System.Drawing.Size(84, 17);
+            this.decompressRadioButton.Size = new System.Drawing.Size(83, 17);
             this.decompressRadioButton.TabIndex = 1;
             this.decompressRadioButton.TabStop = true;
             this.decompressRadioButton.Text = "&Decompress";
@@ -142,12 +144,14 @@
             // 
             // parametersGroupBox
             // 
+            this.parametersGroupBox.Controls.Add(this.endiannessComboBox);
+            this.parametersGroupBox.Controls.Add(this.endiannessLabel);
             this.parametersGroupBox.Controls.Add(this.sizeParameterHexCheckBox);
             this.parametersGroupBox.Controls.Add(this.sizeParameterNumericUpDown);
             this.parametersGroupBox.Controls.Add(this.sizeParameterLabel);
             this.parametersGroupBox.Location = new System.Drawing.Point(329, 12);
             this.parametersGroupBox.Name = "parametersGroupBox";
-            this.parametersGroupBox.Size = new System.Drawing.Size(243, 47);
+            this.parametersGroupBox.Size = new System.Drawing.Size(243, 74);
             this.parametersGroupBox.TabIndex = 2;
             this.parametersGroupBox.TabStop = false;
             this.parametersGroupBox.Text = "Parameters";
@@ -187,6 +191,27 @@
             this.sizeParameterLabel.TabIndex = 0;
             this.sizeParameterLabel.Text = "S&ize:";
             // 
+            // endiannessLabel
+            // 
+            this.endiannessLabel.AutoSize = true;
+            this.endiannessLabel.Location = new System.Drawing.Point(6, 50);
+            this.endiannessLabel.Name = "endiannessLabel";
+            this.endiannessLabel.Size = new System.Drawing.Size(65, 13);
+            this.endiannessLabel.TabIndex = 3;
+            this.endiannessLabel.Text = "&Endianness:";
+            // 
+            // endiannessComboBox
+            // 
+            this.endiannessComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.endiannessComboBox.FormattingEnabled = true;
+            this.endiannessComboBox.Items.AddRange(new object[] {
+            "Big endian",
+            "Little endian"});
+            this.endiannessComboBox.Location = new System.Drawing.Point(77, 47);
+            this.endiannessComboBox.Name = "endiannessComboBox";
+            this.endiannessComboBox.Size = new System.Drawing.Size(160, 21);
+            this.endiannessComboBox.TabIndex = 4;
+            // 
             // sourceFileSelector
             // 
             this.sourceFileSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
@@ -194,7 +219,7 @@
             this.sourceFileSelector.DefaultExt = "bin";
             this.sourceFileSelector.FileName = "";
             this.sourceFileSelector.Filter = "All Files (*.*)|*.*";
-            this.sourceFileSelector.Location = new System.Drawing.Point(221, 65);
+            this.sourceFileSelector.Location = new System.Drawing.Point(221, 92);
             this.sourceFileSelector.Name = "sourceFileSelector";
             this.sourceFileSelector.Size = new System.Drawing.Size(271, 24);
             this.sourceFileSelector.TabIndex = 4;
@@ -207,8 +232,8 @@
             this.destinationFileSelector.DefaultExt = "bin";
             this.destinationFileSelector.FileName = "";
             this.destinationFileSelector.Filter = "All Files (*.*)|*.*";
-            this.destinationFileSelector.Location = new System.Drawing.Point(221, 95);
-            this.destinationFileSelector.Mode = SonicRetro.KensSharp.Comp.FileSelectorMode.Save;
+            this.destinationFileSelector.Location = new System.Drawing.Point(221, 122);
+            this.destinationFileSelector.Mode = SonicRetro.KensSharp.Frontend.FileSelectorMode.Save;
             this.destinationFileSelector.Name = "destinationFileSelector";
             this.destinationFileSelector.Size = new System.Drawing.Size(271, 24);
             this.destinationFileSelector.TabIndex = 6;
@@ -218,7 +243,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(584, 132);
+            this.ClientSize = new System.Drawing.Size(584, 158);
             this.Controls.Add(this.parametersGroupBox);
             this.Controls.Add(this.formatGroupBox);
             this.Controls.Add(this.modeGroupBox);
@@ -230,7 +255,8 @@
             this.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.MaximizeBox = false;
             this.Name = "MainForm";
-            this.Text = "Comp";
+            this.Text = "Frontend";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.modeGroupBox.ResumeLayout(false);
             this.modeGroupBox.PerformLayout();
             this.formatGroupBox.ResumeLayout(false);
@@ -260,6 +286,8 @@
         private System.Windows.Forms.Label sizeParameterLabel;
         private System.Windows.Forms.NumericUpDown sizeParameterNumericUpDown;
         private System.Windows.Forms.CheckBox sizeParameterHexCheckBox;
+        private System.Windows.Forms.ComboBox endiannessComboBox;
+        private System.Windows.Forms.Label endiannessLabel;
 
     }
 }

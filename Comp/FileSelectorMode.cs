@@ -1,4 +1,4 @@
-﻿namespace SonicRetro.KensSharp.Comp
+﻿namespace SonicRetro.KensSharp.Frontend
 {
     using System.Windows.Forms; // for XML docs
 

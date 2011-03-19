@@ -1,4 +1,4 @@
-﻿namespace SonicRetro.KensSharp.Comp
+﻿namespace SonicRetro.KensSharp.Frontend
 {
     partial class FileSelector
     {
