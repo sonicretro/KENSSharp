@@ -37,11 +37,11 @@
             this.formatGroupBox = new System.Windows.Forms.GroupBox();
             this.formatListBox = new System.Windows.Forms.ListBox();
             this.parametersGroupBox = new System.Windows.Forms.GroupBox();
+            this.endiannessComboBox = new System.Windows.Forms.ComboBox();
+            this.endiannessLabel = new System.Windows.Forms.Label();
             this.sizeParameterHexCheckBox = new System.Windows.Forms.CheckBox();
             this.sizeParameterNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.sizeParameterLabel = new System.Windows.Forms.Label();
-            this.endiannessLabel = new System.Windows.Forms.Label();
-            this.endiannessComboBox = new System.Windows.Forms.ComboBox();
             this.sourceFileSelector = new SonicRetro.KensSharp.Frontend.FileSelector();
             this.destinationFileSelector = new SonicRetro.KensSharp.Frontend.FileSelector();
             this.modeGroupBox.SuspendLayout();
@@ -156,6 +156,27 @@
             this.parametersGroupBox.TabStop = false;
             this.parametersGroupBox.Text = "Parameters";
             // 
+            // endiannessComboBox
+            // 
+            this.endiannessComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.endiannessComboBox.FormattingEnabled = true;
+            this.endiannessComboBox.Items.AddRange(new object[] {
+            "Big endian",
+            "Little endian"});
+            this.endiannessComboBox.Location = new System.Drawing.Point(77, 47);
+            this.endiannessComboBox.Name = "endiannessComboBox";
+            this.endiannessComboBox.Size = new System.Drawing.Size(160, 21);
+            this.endiannessComboBox.TabIndex = 4;
+            // 
+            // endiannessLabel
+            // 
+            this.endiannessLabel.AutoSize = true;
+            this.endiannessLabel.Location = new System.Drawing.Point(6, 50);
+            this.endiannessLabel.Name = "endiannessLabel";
+            this.endiannessLabel.Size = new System.Drawing.Size(65, 13);
+            this.endiannessLabel.TabIndex = 3;
+            this.endiannessLabel.Text = "&Endianness:";
+            // 
             // sizeParameterHexCheckBox
             // 
             this.sizeParameterHexCheckBox.AutoSize = true;
@@ -190,27 +211,6 @@
             this.sizeParameterLabel.Size = new System.Drawing.Size(30, 13);
             this.sizeParameterLabel.TabIndex = 0;
             this.sizeParameterLabel.Text = "S&ize:";
-            // 
-            // endiannessLabel
-            // 
-            this.endiannessLabel.AutoSize = true;
-            this.endiannessLabel.Location = new System.Drawing.Point(6, 50);
-            this.endiannessLabel.Name = "endiannessLabel";
-            this.endiannessLabel.Size = new System.Drawing.Size(65, 13);
-            this.endiannessLabel.TabIndex = 3;
-            this.endiannessLabel.Text = "&Endianness:";
-            // 
-            // endiannessComboBox
-            // 
-            this.endiannessComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.endiannessComboBox.FormattingEnabled = true;
-            this.endiannessComboBox.Items.AddRange(new object[] {
-            "Big endian",
-            "Little endian"});
-            this.endiannessComboBox.Location = new System.Drawing.Point(77, 47);
-            this.endiannessComboBox.Name = "endiannessComboBox";
-            this.endiannessComboBox.Size = new System.Drawing.Size(160, 21);
-            this.endiannessComboBox.TabIndex = 4;
             // 
             // sourceFileSelector
             // 
@@ -253,9 +253,10 @@
             this.Controls.Add(this.destinationFileSelector);
             this.Controls.Add(this.goButton);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "MainForm";
-            this.Text = "Frontend";
+            this.Text = "KENSSharp";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.modeGroupBox.ResumeLayout(false);
             this.modeGroupBox.PerformLayout();

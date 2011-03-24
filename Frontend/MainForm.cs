@@ -103,7 +103,7 @@
 
         private void SetSizeParameterEnabled()
         {
-            bool enableSizeParameter = this.formatListBox.SelectedIndex == 5 && this.decompressRadioButton.Enabled;
+            bool enableSizeParameter = this.formatListBox.SelectedIndex == 5 && this.decompressRadioButton.Checked;
             this.sizeParameterLabel.Enabled = enableSizeParameter;
             this.sizeParameterNumericUpDown.Enabled = enableSizeParameter;
             this.sizeParameterHexCheckBox.Enabled = enableSizeParameter;
