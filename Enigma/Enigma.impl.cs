@@ -470,6 +470,10 @@
                                 ilg.Emit(OpCodes.Ldc_I4_S, 11 + i);
                                 ilg.Emit(OpCodes.Shr);
 
+                                // Test only bit 0
+                                ilg.Emit(OpCodes.Ldc_I4_1);
+                                ilg.Emit(OpCodes.And);
+
                                 // Call OutputBitStream<ushort>.Put()
                                 ilg.Emit(OpCodes.Callvirt, UShortOutputBitStreamPut);
 
