@@ -159,6 +159,14 @@
             Push(bitStream, false, destination, data);
             Push(bitStream, true, destination, data);
 
+            // If the bit stream was just flushed, write an empty bit stream that will be read just before the end-of-data
+            // sequence below.
+            if (data.Length == 0)
+            {
+                NeutralEndian.Write1(data, 0);
+                NeutralEndian.Write1(data, 0);
+            }
+
             NeutralEndian.Write1(data, 0);
             NeutralEndian.Write1(data, 0xF0);
             NeutralEndian.Write1(data, 0);
