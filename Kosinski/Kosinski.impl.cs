@@ -161,7 +161,7 @@
 
             // If the bit stream was just flushed, write an empty bit stream that will be read just before the end-of-data
             // sequence below.
-            if (data.Length == 0)
+            if (!bitStream.HasWaitingBits)
             {
                 NeutralEndian.Write1(data, 0);
                 NeutralEndian.Write1(data, 0);

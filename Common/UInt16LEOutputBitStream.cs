@@ -19,6 +19,14 @@
             this.stream = stream;
         }
 
+        public bool HasWaitingBits
+        {
+            get
+            {
+                return this.waitingBits != 0;
+            }
+        }
+
         public override bool Put(bool bit)
         {
             this.byteBuffer <<= 1;
