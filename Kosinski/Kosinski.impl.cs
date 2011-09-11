@@ -67,8 +67,8 @@
                     }
 
                     // Padding between modules
-                    int n = (int)(16 - (destination.Position - 2) % 16);
-                    for (int i = 0; i < n; i++)
+                    long paddingEnd = (((destination.Position - 2) + 0xF) & ~0xF) + 2;
+                    while (destination.Position < paddingEnd)
                     {
                         destination.WriteByte(0);
                     }
@@ -213,19 +213,18 @@
                     break;
                 }
 
-                // Skip null bytes
+                // Skip the padding between modules
                 int b;
-                while ((b = source.ReadByte()) == 0)
+                long paddingEnd = (((source.Position - 2) + 0xF) & ~0xF) + 2;
+                while (source.Position < paddingEnd)
                 {
-                }
+                    b = source.ReadByte();
 
-                if (b == -1)
-                {
-                    throw new EndOfStreamException();
+                    if (b == -1)
+                    {
+                        throw new EndOfStreamException();
+                    }
                 }
-
-                // Position the stream back on the null
-                source.Seek(-1, SeekOrigin.Current);
             }
         }
 
