@@ -9,6 +9,77 @@
 
     public static partial class Nemesis
     {
+        private static byte[,] linearCoeffs2 = new byte[2, 2] {
+            { 3, 0 },
+            { 1, 1 } };
+
+        private static byte[,] linearCoeffs3 = new byte[4, 3] {
+            { 4, 0, 0 },
+            { 2, 1, 0 },
+            { 1, 0, 1 },
+            { 0, 2, 0 }};
+
+        private static byte[,] linearCoeffs4 = new byte[6, 4] {
+            { 5, 0, 0, 0 },
+            { 3, 1, 0, 0 },
+            { 2, 0, 1, 0 },
+            { 1, 2, 0, 0 },
+            { 1, 0, 0, 1 },
+            { 0, 1, 1, 0 } };
+
+        private static byte[,] linearCoeffs5 = new byte[10, 5] {
+            { 6, 0, 0, 0, 0 },
+            { 4, 1, 0, 0, 0 },
+            { 3, 0, 1, 0, 0 },
+            { 2, 2, 0, 0, 0 },
+            { 2, 0, 0, 1, 0 },
+            { 1, 1, 1, 0, 0 },
+            { 1, 0, 0, 0, 1 },
+            { 0, 3, 0, 0, 0 },
+            { 0, 1, 0, 1, 0 },
+            { 0, 0, 2, 0, 0 } };
+
+        private static byte[,] linearCoeffs6 = new byte[14, 6] {
+            { 7, 0, 0, 0, 0, 0 },
+            { 5, 1, 0, 0, 0, 0 },
+            { 4, 0, 1, 0, 0, 0 },
+            { 3, 2, 0, 0, 0, 0 },
+            { 3, 0, 0, 1, 0, 0 },
+            { 2, 1, 1, 0, 0, 0 },
+            { 2, 0, 0, 0, 1, 0 },
+            { 1, 3, 0, 0, 0, 0 },
+            { 1, 1, 0, 1, 0, 0 },
+            { 1, 0, 2, 0, 0, 0 },
+            { 1, 0, 0, 0, 0, 1 },
+            { 0, 2, 1, 0, 0, 0 },
+            { 0, 1, 0, 0, 1, 0 },
+            { 0, 0, 1, 1, 0, 0 } };
+
+        private static byte[,] linearCoeffs7 = new byte[21, 7] {
+            { 8, 0, 0, 0, 0, 0, 0 },
+            { 6, 1, 0, 0, 0, 0, 0 },
+            { 5, 0, 1, 0, 0, 0, 0 },
+            { 4, 2, 0, 0, 0, 0, 0 },
+            { 4, 0, 0, 1, 0, 0, 0 },
+            { 3, 1, 1, 0, 0, 0, 0 },
+            { 3, 0, 0, 0, 1, 0, 0 },
+            { 2, 3, 0, 0, 0, 0, 0 },
+            { 2, 1, 0, 1, 0, 0, 0 },
+            { 2, 0, 2, 0, 0, 0, 0 },
+            { 2, 0, 0, 0, 0, 1, 0 },
+            { 1, 2, 1, 0, 0, 0, 0 },
+            { 1, 1, 0, 0, 1, 0, 0 },
+            { 1, 0, 1, 1, 0, 0, 0 },
+            { 1, 0, 0, 0, 0, 0, 1 },
+            { 0, 4, 0, 0, 0, 0, 0 },
+            { 0, 2, 0, 1, 0, 0, 0 },
+            { 0, 1, 2, 0, 0, 0, 0 },
+            { 0, 1, 0, 0, 0, 1, 0 },
+            { 0, 0, 1, 0, 1, 0, 0 },
+            { 0, 0, 0, 2, 0, 0, 0 } };
+
+        private static byte[][,] linearCoeffs = new byte[][,] { linearCoeffs2, linearCoeffs3, linearCoeffs4, linearCoeffs5, linearCoeffs6, linearCoeffs7 };
+
         private static void Encode(Stream input, Stream output)
         {
             using (PaddedStream paddedInput = new PaddedStream(input, 32, PaddedStreamMode.Read))
@@ -100,7 +171,10 @@
             // of times the underlying nibble run appears in the source file.
 
             // This will hold the Huffman code map.
-            var codeMap = new SortedList<NibbleRun, KeyValuePair<byte, byte>>();
+            // NOTE: while the codes that will be written in the header will not be
+            // longer than 8 bits, it is possible that a supplementary code map will
+            // add "fake" codes that are longer than 8 bits.
+            var codeMap = new SortedList<NibbleRun, KeyValuePair<long, byte>>();
 
             // Size estimate. This is used to build the optimal compressed file.
             long sizeEstimate = long.MaxValue;
@@ -204,11 +278,11 @@
                 // "carry" is how many nibble runs were demoted to a higher bit length
                 // at an earlier step.
                 // "cnt" is how many nibble runs have a given bit length.
-                byte baseCode = 0;
+                long baseCode = 0;
                 long carry = 0, cnt;
 
                 // This list contains the codes sorted by size.
-                var codes = new List<KeyValuePair<byte, byte>>();
+                var codes = new List<KeyValuePair<long, byte>>();
                 for (byte j = 1; j <= 8; j++)
                 {
                     // How many nibble runs have the desired bit length.
@@ -218,7 +292,7 @@
                     for (int k = 0; k < cnt; k++)
                     {
                         // Sequential binary numbers for codes.
-                        byte code = (byte)(baseCode + k);
+                        long code = baseCode + k;
                         long mask = (1L << j) - 1;
 
                         // We do not want any codes composed solely of 1's or which
@@ -232,15 +306,15 @@
                             break;
                         }
 
-                        codes.Add(new KeyValuePair<byte, byte>(code, j));
+                        codes.Add(new KeyValuePair<long, byte>(code, j));
                     }
 
                     // This is the beginning bit pattern for the next bit length.
-                    baseCode = (byte)((baseCode + cnt) << 1);
+                    baseCode = (baseCode + cnt) << 1;
                 }
 
                 // With the canonical table build, the codemap can finally be built.
-                var tempCodemap = new SortedList<NibbleRun, KeyValuePair<byte, byte>>();
+                var tempCodemap = new SortedList<NibbleRun, KeyValuePair<long, byte>>();
                 using (IEnumerator<SizeMapItem> enumerator = sizeMap.GetEnumerator())
                 {
                     int pos = 0;
@@ -264,6 +338,7 @@
                     if (item.Key.Nibble != last)
                     {
                         tempsize_est += 8;
+                        last = item.Key.Nibble;
                     }
 
                     // 2 bytes per nibble run in the table.
@@ -273,13 +348,180 @@
                     tempsize_est += counts[item.Key] * item.Value.Value;
                 }
 
+                // Supplementary code map for the nibble runs that can be broken up into
+                // shorter nibble runs with a smaller bit length than inlining.
+                var supCodemap = new Dictionary<NibbleRun, KeyValuePair<long, byte>>();
+
                 // Now we will compute the size requirements for inline nibble runs.
                 foreach (var item in counts)
                 {
                     if (!tempCodemap.ContainsKey(item.Key))
                     {
-                        tempsize_est += (6 + 7) * item.Value;
+                        // Nibble run does not have its own code. We need to find out if
+                        // we can break it up into smaller nibble runs with total code
+                        // size less than 13 bits or if we need to inline it (13 bits).
+                        if (item.Key.Count == 0)
+                        {
+                            // If this is a nibble run with zero repeats, we can't break
+                            // it up into smaller runs, so we inline it.
+                            tempsize_est += (6 + 7) * item.Value;
+                        }
+                        else if (item.Key.Count == 1)
+                        {
+                            // We stand a chance of breaking the nibble run.
+                            
+                            // This case is rather trivial, so we hard-code it.
+                            // We can break this up only as 2 consecutive runs of a nibble
+                            // run with count == 0.
+                            KeyValuePair<long, byte> value;
+                            if (!tempCodemap.TryGetValue(new NibbleRun(item.Key.Nibble, 0), out value) || value.Value > 6)
+                            {
+                                // The smaller nibble run either does not have its own code
+                                // or it results in a longer bit code when doubled up than
+                                // would result from inlining the run. In either case, we
+                                // inline the nibble run.
+                                tempsize_est += (6 + 7) * item.Value;
+                            }
+                            else
+                            {
+                                // The smaller nibble run has a small enough code that it is
+                                // more efficient to use it twice than to inline our nibble
+                                // run. So we do exactly that, by adding a (temporary) entry
+                                // in the supplementary codemap, which will later be merged
+                                // into the main codemap.
+                                long code = value.Key;
+                                byte len = value.Value;
+                                code = (code << len) | code;
+                                len <<= 1;
+                                tempsize_est += len * item.Value;
+                                supCodemap[item.Key] = new KeyValuePair<long, byte>(code, (byte)(0x80 | len));
+                            }
+                        }
+                        else
+                        {
+                            // We stand a chance of breaking the nibble run.
+                            byte n = item.Key.Count;
+                            
+                            // This is a linear optimization problem subjected to 2
+                            // constraints. If the number of repeats of the current nibble
+                            // run is N, then we have N dimensions.
+                            // Reference to table of linear coefficients. This table has
+                            // N columns for each line.
+                            byte[,] myLinearCoeffs = linearCoeffs[n - 2];
+                            int rows = myLinearCoeffs.GetLength(0);
+
+                            byte nibble = item.Key.Nibble;
+
+                            // List containing the code length of each nibble run, or 13
+                            // if the nibble run is not in the codemap.
+                            var runlen = new List<long>();
+
+                            // Initialize the list.
+                            for (byte i = 0; i < n; i++)
+                            {
+                                // Is this run in the codemap?
+                                KeyValuePair<long, byte> value;
+                                if (tempCodemap.TryGetValue(new NibbleRun(nibble, i), out value))
+                                {
+                                    // It is.
+                                    // Put code length in the vector.
+                                    runlen.Add(value.Value);
+                                }
+                                else
+                                {
+                                    // It is not.
+                                    // Put inline length in the vector.
+                                    runlen.Add(6 + 7);
+                                }
+                            }
+
+                            // Now go through the linear coefficient table and tally up
+                            // the total code size, looking for the best case.
+                            // The best size is initialized to be the inlined case.
+                            long bestSize = 6 + 7;
+                            int bestLine = -1;
+                            for (int i = 0; i < rows; i++)
+                            {
+                                // Tally up the code length for this coefficient line.
+                                long len = 0;
+                                for (byte j = 0; j < n; j++)
+                                {
+                                    byte c = myLinearCoeffs[i, j];
+                                    if (c == 0)
+                                    {
+                                        continue;
+                                    }
+                                    
+                                    len += c * runlen[j];
+                                }
+
+                                // Is the length better than the best yet?
+                                if (len < bestSize)
+                                {
+                                    // If yes, store it as the best.
+                                    bestSize = len;
+                                    bestLine = i;
+                                }
+                            }
+
+                            // Have we found a better code than inlining?
+                            if (bestLine >= 0)
+                            {
+                                // We have; use it. To do so, we have to build the code
+                                // and add it to the supplementary code table.
+                                long code = 0, len = 0;
+                                for (byte i = 0; i < n; i++)
+                                {
+                                    byte c = myLinearCoeffs[bestLine, i];
+                                    if (c == 0)
+                                    {
+                                        continue;
+                                    }
+
+                                    // Is this run in the codemap?
+                                    KeyValuePair<long, byte> value;
+                                    if (tempCodemap.TryGetValue(new NibbleRun(nibble, i), out value))
+                                    {
+                                        // It is; it MUST be, as the other case is impossible
+                                        // by construction.
+                                        for (int j = 0; j < c; j++)
+                                        {
+                                            len += value.Value;
+                                            code <<= value.Value;
+                                            code |= value.Key;
+                                        }
+                                    }
+                                }
+
+                                if (len != bestSize)
+                                {
+                                    // ERROR! DANGER! THIS IS IMPOSSIBLE!
+                                    // But just in case...
+                                    tempsize_est += (6 + 7) * item.Value;
+                                }
+                                else
+                                {
+                                    // By construction, best_size is at most 12.
+                                    byte c = (byte)bestSize;
+
+                                    // Add it to supplementary code map.
+                                    supCodemap[item.Key] = new KeyValuePair<long, byte>(code, (byte)(0x80 | c));
+                                    tempsize_est += bestSize * item.Value;
+                                }
+                            }
+                            else
+                            {
+                                // No, we will have to inline it.
+                                tempsize_est += (6 + 7) * item.Value;
+                            }
+                        }
                     }
+                }
+
+                // Merge the supplementary code map into the temporary code map.
+                foreach (var item in supCodemap)
+                {
+                    tempCodemap[item.Key] = item.Value;
                 }
 
                 // Round up to a full byte.
@@ -301,6 +543,15 @@
             byte lastNibble = 0xff;
             foreach (var item in codeMap)
             {
+                byte length = item.Value.Value;
+
+                // length with bit 7 set is a special device for further reducing file size, and
+                // should NOT be on the table.
+                if ((length & 0x80) != 0)
+                {
+                    continue;
+                }
+
                 NibbleRun nibbleRun = item.Key;
                 if (nibbleRun.Nibble != lastNibble)
                 {
@@ -309,10 +560,9 @@
                     lastNibble = nibbleRun.Nibble;
                 }
 
-                byte code = item.Value.Key;
-                byte length = item.Value.Value;
+                long code = item.Value.Key;
                 NeutralEndian.Write1(output, (byte)((nibbleRun.Count << 4) | length));
-                NeutralEndian.Write1(output, code);
+                NeutralEndian.Write1(output, (byte)code);
             }
 
             // Mark end of header.
@@ -327,10 +577,27 @@
             // need to use inline RLE.
             foreach (var nibbleRun in rleSource)
             {
-                KeyValuePair<byte, byte> value;
+                KeyValuePair<long, byte> value;
                 if (codeMap.TryGetValue(nibbleRun, out value))
                 {
-                    bitStream.Write(value.Key, value.Value);
+                    long code = value.Key;
+                    byte len = value.Value;
+
+                    // len with bit 7 set is a device to bypass the code table at the
+                    // start of the file. We need to clear the bit here before writing
+                    // the code to the file.
+                    len &= 0x7f;
+
+                    // We can have codes in the 9-12 range due to the break up of large
+                    // inlined runs into smaller non-inlined runs. Deal with those high
+                    // bits first, if needed.
+                    if (len > 8)
+                    {
+                        bitStream.Write((byte)((code >> 8) & 0xff), len - 8);
+                        len = 8;
+                    }
+
+                    bitStream.Write((byte)(code & 0xff), len);
                 }
                 else
                 {
