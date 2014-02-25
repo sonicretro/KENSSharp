@@ -1,5 +1,8 @@
 Usage: kenssharp [options] input output
 
+Use a hyphen (-) for input and/or output to have KensSharp read from standard
+input and/or write to standard output.
+
 Arguments:
 
     -h, --help              Shows this help screen.
@@ -10,21 +13,18 @@ Arguments:
                             input file will be recompressed in place.
     -s, --same-filename     The output file name will be the same as the
                             input, with an extension indicating the type of
-                            compression: .kos, .eni, .nem, .sax, .kosm or
-                            .unc.
-    -l, --little-endian     Uses little endian (Intel) byte order
-                            for Enigma and Moduled Kosinski formats.
+                            compression: .kos, .eni, .nem, .sax, .kosm or .unc.
+    -l, --little-endian     Uses little endian (Intel) byte order for Enigma
+                            and Moduled Kosinski formats.
     -n, --no-size           Do not include size in Saxman compressed file.
 
 Formats:
 
-    Kosinski, kos, k    The general-purpose Kosinski compression
-                        format.
-    Enigma, eni, e      The Enigma compression format for plane
-                        mappings.
+    Kosinski, kos, k    The general-purpose Kosinski compression format.
+    Enigma, eni, e      The Enigma compression format for plane mappings.
     Nemesis, nem, n     The Nemesis compression format for art tiles.
     Saxman, sax, s      The Saxman compression format used by Sonic the
                         Hedgehog 2's sound driver and music files.
-    ModuledKosinski,    The general-purpose Moduled Kosinski
-    KosinskiModuled,    compression format used by Sonic 3 & Knuckles.
+    ModuledKosinski,    The general-purpose Moduled Kosinski compression
+    KosinskiModuled,    format used by Sonic 3 & Knuckles.
     mkos, kosm, mk, km

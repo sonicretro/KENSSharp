@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace SonicRetro.KensSharp.KensSharp
 {
@@ -64,52 +65,54 @@ namespace SonicRetro.KensSharp.KensSharp
                 output = input;
             else
                 output = args[getopt.Optind + 1];
-            if (samefilename)
+            if (samefilename && input != "-")
                 switch (mode)
                 {
                     case Mode.Compress:
                         switch (type)
                         {
                             case CompressionType.Kosinski:
-                                output = System.IO.Path.ChangeExtension(input, "kos");
+                                output = Path.ChangeExtension(input, "kos");
                                 break;
                             case CompressionType.Enigma:
-                                output = System.IO.Path.ChangeExtension(input, "eni");
+                                output = Path.ChangeExtension(input, "eni");
                                 break;
                             case CompressionType.Nemesis:
-                                output = System.IO.Path.ChangeExtension(input, "nem");
+                                output = Path.ChangeExtension(input, "nem");
                                 break;
                             case CompressionType.Saxman:
-                                output = System.IO.Path.ChangeExtension(input, "sax");
+                                output = Path.ChangeExtension(input, "sax");
                                 break;
                             case CompressionType.KosinskiModuled:
-                                output = System.IO.Path.ChangeExtension(input, "kosm");
+                                output = Path.ChangeExtension(input, "kosm");
                                 break;
                         }
                         break;
                     case Mode.Decompress:
-                        output = System.IO.Path.ChangeExtension(input, "unc");
+                        output = Path.ChangeExtension(input, "unc");
                         break;
                 }
+			byte[] indata = ReadInput(input);
+			byte[] outdata = null;
             switch (mode)
             {
                 case Mode.Compress:
                     switch (type)
                     {
                         case CompressionType.Kosinski:
-                            Kosinski.Compress(input, output);
+                            outdata = Kosinski.Compress(indata);
                             break;
                         case CompressionType.Enigma:
-                            Enigma.Compress(input, output, endian);
+							outdata = Enigma.Compress(indata, endian);
                             break;
                         case CompressionType.Nemesis:
-                            Nemesis.Compress(input, output);
+							outdata = Nemesis.Compress(indata);
                             break;
                         case CompressionType.Saxman:
-                            Saxman.Compress(input, output, size);
+							outdata = Saxman.Compress(indata, size);
                             break;
                         case CompressionType.ModuledKosinski:
-                            ModuledKosinski.Compress(input, output, endian);
+							outdata = ModuledKosinski.Compress(indata, endian);
                             break;
                     }
                     break;
@@ -117,19 +120,19 @@ namespace SonicRetro.KensSharp.KensSharp
                     switch (type)
                     {
                         case CompressionType.Kosinski:
-                            Kosinski.Decompress(input, output);
+							outdata = Kosinski.Decompress(indata);
                             break;
                         case CompressionType.Enigma:
-                            Enigma.Decompress(input, output, endian);
+							outdata = Enigma.Decompress(indata, endian);
                             break;
                         case CompressionType.Nemesis:
-                            Nemesis.Decompress(input, output);
+							outdata = Nemesis.Decompress(indata);
                             break;
                         case CompressionType.Saxman:
-                            Saxman.Decompress(input, output);
+							outdata = Saxman.Decompress(indata);
                             break;
                         case CompressionType.ModuledKosinski:
-                            ModuledKosinski.Decompress(input, output, endian);
+							outdata = ModuledKosinski.Decompress(indata, endian);
                             break;
                     }
                     break;
@@ -137,29 +140,61 @@ namespace SonicRetro.KensSharp.KensSharp
                     switch (type)
                     {
                         case CompressionType.Kosinski:
-                            Kosinski.Compress(Kosinski.Decompress(input), output);
+							outdata = Kosinski.Compress(Kosinski.Decompress(indata));
                             break;
                         case CompressionType.Enigma:
-                            Enigma.Compress(Enigma.Decompress(input, endian), output, endian);
+							outdata = Enigma.Compress(Enigma.Decompress(indata, endian), endian);
                             break;
                         case CompressionType.Nemesis:
-                            Nemesis.Compress(Nemesis.Decompress(input), output);
+							outdata = Nemesis.Compress(Nemesis.Decompress(indata));
                             break;
                         case CompressionType.Saxman:
-                            Saxman.Compress(Saxman.Decompress(input), output, size);
+							outdata = Saxman.Compress(Saxman.Decompress(indata), size);
                             break;
                         case CompressionType.ModuledKosinski:
-                            ModuledKosinski.Compress(ModuledKosinski.Decompress(input, endian), output, endian);
+							outdata = ModuledKosinski.Compress(ModuledKosinski.Decompress(indata, endian), endian);
                             break;
                     }
                     break;
             }
+			WriteOutput(output, outdata);
         }
 
         static void ShowHelp()
         {
             Console.Write(Properties.Resources.HelpText);
         }
+
+		static byte[] ReadInput(string filename)
+		{
+			if (filename == "-")
+			{
+				System.Collections.Generic.List<byte> result = new System.Collections.Generic.List<byte>();
+				using (Stream stdin = Console.OpenStandardInput())
+				using (BinaryReader read = new BinaryReader(stdin))
+				{
+					byte[] buf = read.ReadBytes(1024);
+					do
+					{
+						result.AddRange(buf);
+						buf = read.ReadBytes(1024);
+					}
+					while (buf.Length > 0);
+				}
+				return result.ToArray();
+			}
+			else
+				return File.ReadAllBytes(filename);
+		}
+
+		static void WriteOutput(string filename, byte[] data)
+		{
+			if (filename == "-")
+				using (Stream stdout = Console.OpenStandardOutput())
+					stdout.Write(data, 0, data.Length);
+			else
+				File.WriteAllBytes(filename, data);
+		}
     }
 
     enum Mode
