@@ -1,8 +1,7 @@
 ﻿namespace SonicRetro.KensSharp.Tests
 {
-    using NUnit.Framework;
+    using Xunit;
 
-    [TestFixture]
     public static class KosinskiCompress
     {
         private static readonly byte[] OneByteTestInput = new byte[] { 0xDC };
@@ -25,39 +24,39 @@
             new byte[] { 0xFF, 0xFF, 0x10, 0x32, 0x54, 0x76, 0x98, 0xBA, 0xDC, 0xFE, 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB,
                 0xCD, 0x02, 0x00, 0xEF, 0x00, 0xF0, 0x00 };
 
-        [TestCase]
+        [Fact]
         public static void TestOneByte()
         {
             byte[] output = Kosinski.Compress(OneByteTestInput);
-            CollectionAssert.AreEqual(OneByteTestOutput, output);
+            Assert.Equal(OneByteTestOutput, output);
         }
 
-        [TestCase]
+        [Fact]
         public static void TestTwoIdenticalBytes()
         {
             byte[] output = Kosinski.Compress(TwoIdenticalBytesTestInput);
-            CollectionAssert.AreEqual(TwoIdenticalBytesTestOutput, output);
+            Assert.Equal(TwoIdenticalBytesTestOutput, output);
         }
 
-        [TestCase]
+        [Fact]
         public static void TestTwoDifferentBytes()
         {
             byte[] output = Kosinski.Compress(TwoDifferentBytesTestInput);
-            CollectionAssert.AreEqual(TwoDifferentBytesTestOutput, output);
+            Assert.Equal(TwoDifferentBytesTestOutput, output);
         }
 
-        [TestCase]
+        [Fact]
         public static void TestSixteenIdenticalBytes()
         {
             byte[] output = Kosinski.Compress(SixteenIdenticalBytesTestInput);
-            CollectionAssert.AreEqual(SixteenIdenticalBytesTestOutput, output);
+            Assert.Equal(SixteenIdenticalBytesTestOutput, output);
         }
 
-        [TestCase]
+        [Fact]
         public static void TestSixteenDifferentBytes()
         {
             byte[] output = Kosinski.Compress(SixteenDifferentBytesTestInput);
-            CollectionAssert.AreEqual(SixteenDifferentBytesTestOutput, output);
+            Assert.Equal(SixteenDifferentBytesTestOutput, output);
         }
     }
 }
