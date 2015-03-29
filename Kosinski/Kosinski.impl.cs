@@ -83,77 +83,81 @@
         {
             UInt16LEOutputBitStream bitStream = new UInt16LEOutputBitStream(destination);
             MemoryStream data = new MemoryStream();
-            long bPointer = 1, iOffset = 0;
-            bitStream.Push(true);
-            NeutralEndian.Write1(data, buffer[0]);
 
-            while (bPointer < size)
+            if (size > 0)
             {
-                long iCount = Math.Min(recLength, size - bPointer);
-                long iMax = Math.Max(bPointer - slidingWindow, 0);
-                long k = 1;
-                long i = bPointer - 1;
+                long bPointer = 1, iOffset = 0;
+                bitStream.Push(true);
+                NeutralEndian.Write1(data, buffer[0]);
 
-                do
+                while (bPointer < size)
                 {
-                    long j = 0;
-                    while (buffer[i + j] == buffer[bPointer + j])
+                    long iCount = Math.Min(recLength, size - bPointer);
+                    long iMax = Math.Max(bPointer - slidingWindow, 0);
+                    long k = 1;
+                    long i = bPointer - 1;
+
+                    do
                     {
-                        if (++j >= iCount)
+                        long j = 0;
+                        while (buffer[i + j] == buffer[bPointer + j])
                         {
-                            break;
+                            if (++j >= iCount)
+                            {
+                                break;
+                            }
                         }
-                    }
 
-                    if (j > k)
+                        if (j > k)
+                        {
+                            k = j;
+                            iOffset = i;
+                        }
+                    } while (i-- > iMax);
+
+                    iCount = k;
+
+                    if (iCount == 1)
                     {
-                        k = j;
-                        iOffset = i;
+                        Push(bitStream, true, destination, data);
+                        NeutralEndian.Write1(data, buffer[bPointer]);
                     }
-                } while (i-- > iMax);
-
-                iCount = k;
-
-                if (iCount == 1)
-                {
-                    Push(bitStream, true, destination, data);
-                    NeutralEndian.Write1(data, buffer[bPointer]);
-                }
-                else if (iCount == 2 && bPointer - iOffset > 256)
-                {
-                    Push(bitStream, true, destination, data);
-                    NeutralEndian.Write1(data, buffer[bPointer]);
-                    --iCount;
-                }
-                else if (iCount < 6 && bPointer - iOffset <= 256)
-                {
-                    Push(bitStream, false, destination, data);
-                    Push(bitStream, false, destination, data);
-                    Push(bitStream, (((iCount - 2) >> 1) & 1) != 0, destination, data);
-                    Push(bitStream, ((iCount - 2) & 1) != 0, destination, data);
-                    NeutralEndian.Write1(data, (byte)(~(bPointer - iOffset - 1)));
-                }
-                else
-                {
-                    Push(bitStream, false, destination, data);
-                    Push(bitStream, true, destination, data);
-
-                    long off = bPointer - iOffset - 1;
-                    ushort info = (ushort)(~((off << 8) | (off >> 5)) & 0xFFF8);
-
-                    if (iCount < 10) // iCount - 2 < 8
+                    else if (iCount == 2 && bPointer - iOffset > 256)
                     {
-                        info |= (ushort)(iCount - 2);
-                        BigEndian.Write2(data, info);
+                        Push(bitStream, true, destination, data);
+                        NeutralEndian.Write1(data, buffer[bPointer]);
+                        --iCount;
+                    }
+                    else if (iCount < 6 && bPointer - iOffset <= 256)
+                    {
+                        Push(bitStream, false, destination, data);
+                        Push(bitStream, false, destination, data);
+                        Push(bitStream, (((iCount - 2) >> 1) & 1) != 0, destination, data);
+                        Push(bitStream, ((iCount - 2) & 1) != 0, destination, data);
+                        NeutralEndian.Write1(data, (byte)(~(bPointer - iOffset - 1)));
                     }
                     else
                     {
-                        BigEndian.Write2(data, info);
-                        NeutralEndian.Write1(data, (byte)(iCount - 1));
-                    }
-                }
+                        Push(bitStream, false, destination, data);
+                        Push(bitStream, true, destination, data);
 
-                bPointer += iCount;
+                        long off = bPointer - iOffset - 1;
+                        ushort info = (ushort)(~((off << 8) | (off >> 5)) & 0xFFF8);
+
+                        if (iCount < 10) // iCount - 2 < 8
+                        {
+                            info |= (ushort)(iCount - 2);
+                            BigEndian.Write2(data, info);
+                        }
+                        else
+                        {
+                            BigEndian.Write2(data, info);
+                            NeutralEndian.Write1(data, (byte)(iCount - 1));
+                        }
+                    }
+
+                    bPointer += iCount;
+                }
             }
 
             Push(bitStream, false, destination, data);

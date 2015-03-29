@@ -10,6 +10,9 @@
         static KosinskiCompress()
         {
             AddDataItem(
+                new byte[] { },
+                new byte[] { 0x02, 0x00, 0x00, 0xF0, 0x00 });
+            AddDataItem(
                 new byte[] { 0xDC },
                 new byte[] { 0x05, 0x00, 0xDC, 0x00, 0xF0, 0x00 });
             AddDataItem(
