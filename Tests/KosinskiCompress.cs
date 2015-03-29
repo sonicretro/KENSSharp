@@ -35,6 +35,15 @@
             Assert.Equal(expectedOutput, actualOutput);
         }
 
+        [Theory]
+        [MemberData("Data")]
+        public static void CompressionThenDecompressionRoundtrips(byte[] input, byte[] ignored)
+        {
+            byte[] compressed = Kosinski.Compress(input);
+            byte[] decompressed = Kosinski.Decompress(compressed);
+            Assert.Equal(input, decompressed);
+        }
+
         private static void AddDataItem(byte[] input, byte[] expectedOutput)
         {
             Data.Add(new[] { input, expectedOutput });
