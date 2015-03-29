@@ -87,7 +87,7 @@
             bitStream.Push(true);
             NeutralEndian.Write1(data, buffer[0]);
 
-            do
+            while (bPointer < size)
             {
                 long iCount = Math.Min(recLength, size - bPointer);
                 long iMax = Math.Max(bPointer - slidingWindow, 0);
@@ -154,7 +154,7 @@
                 }
 
                 bPointer += iCount;
-            } while (bPointer < size);
+            }
 
             Push(bitStream, false, destination, data);
             Push(bitStream, true, destination, data);
