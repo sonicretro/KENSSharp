@@ -1,7 +1,5 @@
 ﻿namespace SonicRetro.KensSharp
 {
-    using System;
-
     public abstract class InputBitStream
     {
         public abstract bool Get();

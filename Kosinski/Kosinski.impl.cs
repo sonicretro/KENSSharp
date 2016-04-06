@@ -9,77 +9,68 @@
         private const long SlidingWindow = 8192;
         private const long RecurrenceLength = 256;
 
-        [SecuritySafeCritical]
-        internal static unsafe void Encode(Stream source, Stream destination)
+        internal static void Encode(Stream source, Stream destination)
         {
             long size = source.Length - source.Position;
             byte[] buffer = new byte[size];
             source.Read(buffer, 0, (int)size);
 
-            fixed (byte* ptr = buffer)
-            {
-                EncodeInternal(destination, ptr, SlidingWindow, RecurrenceLength, size);
-            }
+            EncodeInternal(destination, buffer, 0, SlidingWindow, RecurrenceLength, size);
         }
 
-        [SecuritySafeCritical]
-        internal static unsafe void Encode(Stream source, Stream destination, Endianness headerEndianness)
+        internal static void Encode(Stream source, Stream destination, Endianness headerEndianness)
         {
             long size = source.Length - source.Position;
             byte[] buffer = new byte[size];
             source.Read(buffer, 0, (int)size);
 
-            fixed (byte* fixedPtr = buffer)
+            long pos = 0;
+            if (size > 0xffff)
             {
-                byte* ptr = fixedPtr;
-                if (size > 0xffff)
+                throw new CompressionException(Properties.Resources.KosinskiTotalSizeTooLarge);
+            }
+
+            long remainingSize = size;
+            long compBytes = 0;
+
+            if (remainingSize > 0x1000)
+            {
+                remainingSize = 0x1000;
+            }
+
+            if (headerEndianness == Endianness.BigEndian)
+            {
+                BigEndian.Write2(destination, (ushort)size);
+            }
+            else
+            {
+                LittleEndian.Write2(destination, (ushort)size);
+            }
+
+            for (;;)
+            {
+                EncodeInternal(destination, buffer, pos, SlidingWindow, RecurrenceLength, remainingSize);
+
+                compBytes += remainingSize;
+                pos += remainingSize;
+
+                if (compBytes >= size)
                 {
-                    throw new CompressionException(Properties.Resources.KosinskiTotalSizeTooLarge);
+                    break;
                 }
 
-                long remainingSize = size;
-                long compBytes = 0;
-
-                if (remainingSize > 0x1000)
+                // Padding between modules
+                long paddingEnd = (((destination.Position - 2) + 0xF) & ~0xF) + 2;
+                while (destination.Position < paddingEnd)
                 {
-                    remainingSize = 0x1000;
+                    destination.WriteByte(0);
                 }
 
-                if (headerEndianness == Endianness.BigEndian)
-                {
-                    BigEndian.Write2(destination, (ushort)size);
-                }
-                else
-                {
-                    LittleEndian.Write2(destination, (ushort)size);
-                }
-
-                for (;;)
-                {
-                    EncodeInternal(destination, ptr, SlidingWindow, RecurrenceLength, remainingSize);
-
-                    compBytes += remainingSize;
-                    ptr += remainingSize;
-
-                    if (compBytes >= size)
-                    {
-                        break;
-                    }
-
-                    // Padding between modules
-                    long paddingEnd = (((destination.Position - 2) + 0xF) & ~0xF) + 2;
-                    while (destination.Position < paddingEnd)
-                    {
-                        destination.WriteByte(0);
-                    }
-
-                    remainingSize = Math.Min(0x1000L, size - compBytes);
-                }
+                remainingSize = Math.Min(0x1000L, size - compBytes);
             }
         }
 
-        [SecurityCritical]
-        private static unsafe void EncodeInternal(Stream destination, byte* buffer, long slidingWindow, long recLength, long size)
+        private static void EncodeInternal(Stream destination, byte[] buffer, long pos, long slidingWindow, long recLength, long size)
         {
             UInt16LEOutputBitStream bitStream = new UInt16LEOutputBitStream(destination);
             MemoryStream data = new MemoryStream();
@@ -88,7 +79,7 @@
             {
                 long bPointer = 1, iOffset = 0;
                 bitStream.Push(true);
-                NeutralEndian.Write1(data, buffer[0]);
+                NeutralEndian.Write1(data, buffer[pos]);
 
                 while (bPointer < size)
                 {
@@ -100,7 +91,7 @@
                     do
                     {
                         long j = 0;
-                        while (buffer[i + j] == buffer[bPointer + j])
+                        while (buffer[pos + i + j] == buffer[pos + bPointer + j])
                         {
                             if (++j >= iCount)
                             {
@@ -120,12 +111,12 @@
                     if (iCount == 1)
                     {
                         Push(bitStream, true, destination, data);
-                        NeutralEndian.Write1(data, buffer[bPointer]);
+                        NeutralEndian.Write1(data, buffer[pos + bPointer]);
                     }
                     else if (iCount == 2 && bPointer - iOffset > 256)
                     {
                         Push(bitStream, true, destination, data);
-                        NeutralEndian.Write1(data, buffer[bPointer]);
+                        NeutralEndian.Write1(data, buffer[pos + bPointer]);
                         --iCount;
                     }
                     else if (iCount < 6 && bPointer - iOffset <= 256)

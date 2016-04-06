@@ -369,7 +369,7 @@
                         else if (item.Key.Count == 1)
                         {
                             // We stand a chance of breaking the nibble run.
-                            
+
                             // This case is rather trivial, so we hard-code it.
                             // We can break this up only as 2 consecutive runs of a nibble
                             // run with count == 0.
@@ -401,7 +401,7 @@
                         {
                             // We stand a chance of breaking the nibble run.
                             byte n = item.Key.Count;
-                            
+
                             // This is a linear optimization problem subjected to 2
                             // constraints. If the number of repeats of the current nibble
                             // run is N, then we have N dimensions.
@@ -451,7 +451,7 @@
                                     {
                                         continue;
                                     }
-                                    
+
                                     len += c * runlen[j];
                                 }
 
@@ -953,17 +953,11 @@
 
         private sealed class XorStream : Stream
         {
-            [StructLayout(LayoutKind.Sequential)]
-            private struct ByteBuffer
-            {
-                internal unsafe fixed byte bytes[4];
-            }
-
             private static string TypeName = typeof(XorStream).FullName;
 
             private Stream stream;
             private int subPosition; // 0-3
-            private ByteBuffer bytes;
+            private byte[] bytes;
 
             public XorStream(Stream stream)
             {
@@ -973,7 +967,7 @@
                 }
 
                 this.stream = stream;
-                this.bytes = new ByteBuffer();
+                this.bytes = new byte[4];
             }
 
             public override bool CanRead
@@ -1031,8 +1025,7 @@
                 }
             }
 
-            [SecuritySafeCritical]
-            public unsafe override int Read(byte[] buffer, int offset, int count)
+            public override int Read(byte[] buffer, int offset, int count)
             {
                 if (buffer == null)
                 {
@@ -1065,16 +1058,13 @@
                 }
 
                 int readBytes = this.stream.Read(buffer, offset, count);
-                fixed (byte* bytes = this.bytes.bytes)
+                for (int i = 0; i < readBytes; i++)
                 {
-                    for (int i = 0; i < readBytes; i++)
-                    {
-                        byte b = buffer[offset + i];
-                        buffer[offset + i] ^= bytes[this.subPosition];
-                        bytes[this.subPosition] = b;
-                        ++this.subPosition;
-                        this.subPosition &= 3;
-                    }
+                    byte b = buffer[offset + i];
+                    buffer[offset + i] ^= bytes[this.subPosition];
+                    bytes[this.subPosition] = b;
+                    ++this.subPosition;
+                    this.subPosition &= 3;
                 }
 
                 return readBytes;
@@ -1090,8 +1080,7 @@
                 throw new NotSupportedException();
             }
 
-            [SecuritySafeCritical]
-            public unsafe override void Write(byte[] buffer, int offset, int count)
+            public override void Write(byte[] buffer, int offset, int count)
             {
                 if (buffer == null)
                 {
@@ -1129,15 +1118,12 @@
                 }
 
                 byte[] xorBuffer = new byte[count];
-                fixed (byte* bytes = this.bytes.bytes)
+                for (int i = 0; i < count; i++)
                 {
-                    for (int i = 0; i < count; i++)
-                    {
-                        bytes[this.subPosition] ^= buffer[i];
-                        xorBuffer[i] = bytes[this.subPosition];
-                        ++this.subPosition;
-                        this.subPosition &= 3;
-                    }
+                    bytes[this.subPosition] ^= buffer[i];
+                    xorBuffer[i] = bytes[this.subPosition];
+                    ++this.subPosition;
+                    this.subPosition &= 3;
                 }
 
                 this.stream.Write(xorBuffer, 0, count);
