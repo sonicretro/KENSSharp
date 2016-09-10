@@ -8,9 +8,9 @@
     {
         private static void Encode(Stream input, Stream output, bool withSize)
         {
-            long inputSize = input.Length - input.Position + 0x12;
+            long inputSize = input.Length - input.Position;
             byte[] inputBuffer = new byte[inputSize];
-            input.Read(inputBuffer, 0x12, (int)(inputSize - 0x12));
+            input.Read(inputBuffer, 0, (int)inputSize);
 
             long outputInitialPosition = output.Position;
             if (withSize)
@@ -21,39 +21,51 @@
             List<byte> data = new List<byte>();
             UInt8OutputBitStream bitStream = new UInt8OutputBitStream(output);
 
-            long inputPointer = 0x12;
+            long inputPointer = 0;
             while (inputPointer < inputSize)
             {
                 // The maximum recurrence length that can be encoded is 0x12
-                long count = Math.Min(inputSize - inputPointer, 0x12);
+                long maximumRecurrenceLength = Math.Min(inputSize - inputPointer, 0x12);
 
                 // Minimal recurrence length, will contain the total recurrence length
-                long offset = 0;
-                long k = 1;
-                long i = Math.Max(inputPointer - 0x1000, 0);
+                long offset = inputPointer;
+                long longestBackreferenceLength = 1;
+                long i = Math.Max(inputPointer - 0x1000, -0x12);
 
-                do
+                // First, check if we can encode a zero fill.
+                if (i == -0x12)
                 {
                     long j = 0;
-                    while (inputBuffer[i + j] == inputBuffer[inputPointer + j] && ++j < count)
+                    while (inputBuffer[inputPointer + j] == 0 && ++j < 0x12)
                     {
                     }
 
-                    if (j > k)
+                    if (j > 1)
                     {
-                        k = j;
+                        longestBackreferenceLength = j;
+                        offset = -0x12;
+                    }
+
+                    i = 0;
+                }
+
+                while (i < inputPointer)
+                {
+                    long j = 0;
+                    while (inputBuffer[i + j] == inputBuffer[inputPointer + j] && ++j < maximumRecurrenceLength)
+                    {
+                    }
+
+                    if (j > longestBackreferenceLength)
+                    {
+                        longestBackreferenceLength = j;
                         offset = i;
                     }
 
-                    if (i == 0)
-                    {
-                        i = 0x11;
-                    }
-                } while (++i < inputPointer);
+                    i++;
+                }
 
-                count = k;
-
-                if (count == 1 || count == 2)
+                if (longestBackreferenceLength == 1 || longestBackreferenceLength == 2)
                 {
                     data.Add(inputBuffer[inputPointer]);
                     if (bitStream.Push(true))
@@ -63,12 +75,12 @@
                         data.Clear();
                     }
 
-                    count = 1;
+                    longestBackreferenceLength = 1;
                 }
                 else
                 {
-                    long iOffset = ((offset - 0x12) & 0xfff) - 0x12;
-                    ushort word = (ushort)(((iOffset & 0xFF) << 8) | ((iOffset & 0xF00) >> 4) | ((count - 3) & 0x0F));
+                    long iOffset = (offset & 0xfff) - 0x12;
+                    ushort word = (ushort)(((iOffset & 0xFF) << 8) | ((iOffset & 0xF00) >> 4) | ((longestBackreferenceLength - 3) & 0x0F));
                     data.Add((byte)(word >> 8));
                     data.Add((byte)(word & 0xff));
                     if (bitStream.Push(false))
@@ -79,7 +91,7 @@
                     }
                 }
 
-                inputPointer += count;
+                inputPointer += longestBackreferenceLength;
             }
 
             {
