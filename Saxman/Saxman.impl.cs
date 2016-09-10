@@ -47,7 +47,7 @@
 
                     if (i == 0)
                     {
-                        i = 11;
+                        i = 0x11;
                     }
                 } while (++i < inputPointer);
 
