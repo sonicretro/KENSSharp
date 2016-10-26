@@ -5,6 +5,8 @@
 
     public sealed class UInt16BEInputBitStream : InputBitStream<ushort>
     {
+        public Boolean littleEndianBits;
+        public Boolean earlyDescriptor;
         private Stream stream;
         private int remainingBits;
         private ushort byteBuffer;
@@ -19,6 +21,8 @@
             this.stream = stream;
             this.remainingBits = 16;
             this.byteBuffer = BigEndian.Read2(stream);
+            this.littleEndianBits = true;
+            this.earlyDescriptor = true;
         }
 
         public override bool Get()
@@ -32,10 +36,26 @@
 
         public override bool Pop()
         {
+            if (!earlyDescriptor)
+                this.CheckBuffer();
+
             --this.remainingBits;
-            ushort bit = (ushort)(this.byteBuffer & 1);
-            this.byteBuffer >>= 1;
-            this.CheckBuffer();
+            ushort bit;
+
+            if (littleEndianBits)
+            {
+                bit = (ushort)(this.byteBuffer & 1);
+                this.byteBuffer >>= 1;
+            }
+            else
+            {
+                bit = (ushort)(this.byteBuffer & 0x8000);
+                this.byteBuffer <<= 1;
+            }
+
+            if (earlyDescriptor)
+                this.CheckBuffer();
+
             return bit != 0;
         }
 
