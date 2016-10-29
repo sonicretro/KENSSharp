@@ -5,6 +5,7 @@
 
     public sealed class UInt16BEOutputBitStream : OutputBitStream<ushort>
     {
+        public Boolean littleEndianBits;
         private Stream stream;
         private int waitingBits;
         private ushort byteBuffer;
@@ -17,6 +18,7 @@
             }
 
             this.stream = stream;
+            this.littleEndianBits = true;
         }
 
         public override bool Put(bool bit)
@@ -36,7 +38,11 @@
 
         public override bool Push(bool bit)
         {
-            this.byteBuffer |= (ushort)(Convert.ToUInt16(bit) << this.waitingBits);
+            if (littleEndianBits)
+                this.byteBuffer |= (ushort)(Convert.ToUInt16(bit) << this.waitingBits);
+            else
+                this.byteBuffer |= (ushort)(Convert.ToUInt16(bit) << (15-this.waitingBits));
+
             if (++this.waitingBits >= 16)
             {
                 BigEndian.Write2(this.stream, this.byteBuffer);
