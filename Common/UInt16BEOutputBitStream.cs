@@ -5,12 +5,12 @@
 
     public sealed class UInt16BEOutputBitStream : OutputBitStream<ushort>
     {
-        public Boolean littleEndianBits;
         private Stream stream;
         private int waitingBits;
         private ushort byteBuffer;
+        private bool littleEndianBits;
 
-        public UInt16BEOutputBitStream(Stream stream)
+        public UInt16BEOutputBitStream(Stream stream, bool littleEndianBits)
         {
             if (stream == null)
             {
@@ -18,7 +18,7 @@
             }
 
             this.stream = stream;
-            this.littleEndianBits = true;   // Default to true for backwards-compatibility
+            this.littleEndianBits = littleEndianBits;
         }
 
         public override bool Put(bool bit)

@@ -8,8 +8,10 @@
         private Stream stream;
         private int remainingBits;
         private byte byteBuffer;
+        private bool littleEndianBits;
+        private bool earlyDescriptor;
 
-        public UInt8InputBitStream(Stream stream)
+        public UInt8InputBitStream(Stream stream, bool littleEndianBits, bool earlyDescriptor)
         {
             if (stream == null)
             {
@@ -17,8 +19,18 @@
             }
 
             this.stream = stream;
-            this.remainingBits = 8;
-            this.byteBuffer = NeutralEndian.Read1(stream);
+            this.littleEndianBits = littleEndianBits;
+            this.earlyDescriptor = earlyDescriptor;
+
+            if (this.earlyDescriptor)
+            {
+                this.remainingBits = 8;
+                this.byteBuffer = this.littleEndianBits ? NeutralEndian.Read1(stream) : reverseBits(NeutralEndian.Read1(stream));
+            }
+            else
+            {
+                this.remainingBits = 0;
+            }
         }
 
         public override bool Get()
@@ -32,10 +44,16 @@
 
         public override bool Pop()
         {
+            if (!this.earlyDescriptor)
+                this.CheckBuffer();
+
             --this.remainingBits;
             byte bit = (byte)(this.byteBuffer & 1);
             this.byteBuffer >>= 1;
-            this.CheckBuffer();
+
+            if (this.earlyDescriptor)
+                this.CheckBuffer();
+
             return bit != 0;
         }
 
@@ -55,7 +73,7 @@
             {
                 int delta = count - this.remainingBits;
                 byte lowBits = (byte)(this.byteBuffer << delta);
-                this.byteBuffer = NeutralEndian.Read1(stream);
+                this.byteBuffer = this.littleEndianBits ? NeutralEndian.Read1(stream) : reverseBits(NeutralEndian.Read1(stream));
                 this.remainingBits = 8 - delta;
                 ushort highBits = (byte)(this.byteBuffer >> this.remainingBits);
                 this.byteBuffer ^= (byte)(highBits << this.remainingBits);
@@ -72,9 +90,21 @@
         {
             if (this.remainingBits == 0)
             {
-                this.byteBuffer = NeutralEndian.Read1(stream);
+                this.byteBuffer = this.littleEndianBits ? NeutralEndian.Read1(stream) : reverseBits(NeutralEndian.Read1(stream));
                 this.remainingBits = 8;
             }
+        }
+
+        public override byte reverseBits(byte val)
+        {
+            byte sz = 1 * 8;  // bit size; must be power of 2 
+            byte mask = 0xFF;
+            while ((sz >>= 1) > 0)
+            {
+                mask ^= (byte)(mask << sz);
+                val = (byte)(((val >> sz) & mask) | ((val << sz) & ~mask));
+            }
+            return val;
         }
     }
 }

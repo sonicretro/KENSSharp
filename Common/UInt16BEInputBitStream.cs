@@ -5,13 +5,13 @@
 
     public sealed class UInt16BEInputBitStream : InputBitStream<ushort>
     {
-        public Boolean littleEndianBits;
-        public Boolean earlyDescriptor;
         private Stream stream;
         private int remainingBits;
         private ushort byteBuffer;
+        private bool littleEndianBits;
+        private bool earlyDescriptor;
 
-        public UInt16BEInputBitStream(Stream stream)
+        public UInt16BEInputBitStream(Stream stream, bool littleEndianBits, bool earlyDescriptor)
         {
             if (stream == null)
             {
@@ -19,10 +19,18 @@
             }
 
             this.stream = stream;
-            this.remainingBits = 16;
-            this.byteBuffer = BigEndian.Read2(stream);
-            this.littleEndianBits = true;
-            this.earlyDescriptor = true;
+            this.littleEndianBits = littleEndianBits;
+            this.earlyDescriptor = earlyDescriptor;
+
+            if (this.earlyDescriptor)
+            {
+                this.remainingBits = 16;
+                this.byteBuffer = this.littleEndianBits ? BigEndian.Read2(stream) : reverseBits(BigEndian.Read2(stream));
+            }
+            else
+            {
+                this.remainingBits = 0;
+            }
         }
 
         public override bool Get()
@@ -36,24 +44,16 @@
 
         public override bool Pop()
         {
-            if (!earlyDescriptor)
+            if (!this.earlyDescriptor)
                 this.CheckBuffer();
 
             --this.remainingBits;
             ushort bit;
+            
+            bit = (ushort)(this.byteBuffer & 1);
+            this.byteBuffer >>= 1;
 
-            if (littleEndianBits)
-            {
-                bit = (ushort)(this.byteBuffer & 1);
-                this.byteBuffer >>= 1;
-            }
-            else
-            {
-                bit = (ushort)(this.byteBuffer & 0x8000);
-                this.byteBuffer <<= 1;
-            }
-
-            if (earlyDescriptor)
+            if (this.earlyDescriptor)
                 this.CheckBuffer();
 
             return bit != 0;
@@ -66,7 +66,7 @@
             {
                 int delta = count - this.remainingBits;
                 ushort lowBits = (ushort)(this.byteBuffer << delta);
-                this.byteBuffer = BigEndian.Read2(stream);
+                this.byteBuffer = this.littleEndianBits ? BigEndian.Read2(stream) : reverseBits(BigEndian.Read2(stream));
                 this.remainingBits = 16 - delta;
                 ushort highBits = (ushort)(this.byteBuffer >> this.remainingBits);
                 this.byteBuffer ^= (ushort)(highBits << this.remainingBits);
@@ -83,9 +83,21 @@
         {
             if (this.remainingBits == 0)
             {
-                this.byteBuffer = BigEndian.Read2(stream);
+                this.byteBuffer = this.littleEndianBits ? BigEndian.Read2(stream) : reverseBits(BigEndian.Read2(stream));
                 this.remainingBits = 16;
             }
+        }
+
+        public override ushort reverseBits(ushort val)
+        {
+            ushort sz = 2 * 8;  // bit size; must be power of 2 
+            ushort mask = 0xFFFF;
+            while ((sz >>= 1) > 0)
+            {
+                mask ^= (ushort)(mask << sz);
+                val = (ushort)(((val >> sz) & mask) | ((val << sz) & ~mask));
+            }
+            return val;
         }
     }
 }

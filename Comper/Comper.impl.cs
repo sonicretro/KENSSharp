@@ -25,8 +25,7 @@
         [SecurityCritical]
         private static unsafe void EncodeInternal(Stream destination, byte* buffer, long slidingWindow, long recLength, long size)
         {
-            UInt16BEOutputBitStream bitStream = new UInt16BEOutputBitStream(destination);
-            bitStream.littleEndianBits = false;
+            UInt16BEOutputBitStream bitStream = new UInt16BEOutputBitStream(destination, false);
             MemoryStream data = new MemoryStream();
 
             if (size > 0)
@@ -128,10 +127,7 @@
 
         private static void DecodeInternal(Stream source, Stream destination)
         {
-            UInt16BEInputBitStream bitStream = new UInt16BEInputBitStream(source);
-			bitStream.littleEndianBits = false;
-			bitStream.earlyDescriptor = false;
-
+            UInt16BEInputBitStream bitStream = new UInt16BEInputBitStream(source, false, false);
 
 			for (;;)
             {

@@ -81,7 +81,7 @@
         [SecurityCritical]
         private static unsafe void EncodeInternal(Stream destination, byte* buffer, long slidingWindow, long recLength, long size)
         {
-            UInt16LEOutputBitStream bitStream = new UInt16LEOutputBitStream(destination);
+            UInt16LEOutputBitStream bitStream = new UInt16LEOutputBitStream(destination, true);
             MemoryStream data = new MemoryStream();
 
             if (size > 0)
@@ -234,7 +234,7 @@
 
         private static void DecodeInternal(Stream source, Stream destination, ref long decompressedBytes)
         {
-            UInt16LEInputBitStream bitStream = new UInt16LEInputBitStream(source);
+            UInt16LEInputBitStream bitStream = new UInt16LEInputBitStream(source, true, true);
 
             for (;;)
             {
