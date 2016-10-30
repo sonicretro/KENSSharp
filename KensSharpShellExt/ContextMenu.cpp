@@ -24,7 +24,9 @@ wchar_t *itemargs[] = {
 	L"-dkm",
 	L"-ckm",
 	L"-dkm -l",
-	L"-ckm -l"
+	L"-ckm -l",
+	L"-dc",
+	L"-cc"
 };
 
 struct iteminfo { int id; wchar_t *text; iteminfo *subitems; };
@@ -56,6 +58,7 @@ iteminfo saxmenu[] = {
 	{ -1 }
 };
 endianmenu(kosm);
+defaultmenu(comp);
 
 int maxid = curid;
 
@@ -65,6 +68,7 @@ iteminfo rootmenu[] = {
 	{ curid++, L"&Nemesis", nemmenu },
 	{ curid++, L"&Saxman", saxmenu },
 	{ curid++, L"&Moduled Kosinski", kosmmenu },
+	{ curid++, L"&Comper", compmenu },
 	{ -1 }
 };
 
