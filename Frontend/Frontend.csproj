@@ -87,6 +87,10 @@
       <Project>{2A97FB96-68CF-4DF8-BEF7-BF14ECDDE629}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Comper\Comper.csproj">
+      <Project>{816fc40d-a6e6-468d-bc59-5eb6604de4f1}</Project>
+      <Name>Comper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Enigma\Enigma.csproj">
       <Project>{8CF574E9-61B2-4185-85D0-308CC3C116BF}</Project>
       <Name>Enigma</Name>

@@ -86,6 +86,9 @@ namespace SonicRetro.KensSharp.KensSharp
                             case CompressionType.KosinskiModuled:
                                 output = Path.ChangeExtension(input, "kosm");
                                 break;
+                            case CompressionType.Comper:
+                                output = Path.ChangeExtension(input, "comp");
+                                break;
                         }
                         break;
                     case Mode.Decompress:
@@ -112,7 +115,10 @@ namespace SonicRetro.KensSharp.KensSharp
 							outdata = Saxman.Compress(indata, size);
                             break;
                         case CompressionType.ModuledKosinski:
-							outdata = ModuledKosinski.Compress(indata, endian);
+                            outdata = ModuledKosinski.Compress(indata, endian);
+                            break;
+                        case CompressionType.Comper:
+                            outdata = Comper.Compress(indata);
                             break;
                     }
                     break;
@@ -132,7 +138,10 @@ namespace SonicRetro.KensSharp.KensSharp
 							outdata = Saxman.Decompress(indata);
                             break;
                         case CompressionType.ModuledKosinski:
-							outdata = ModuledKosinski.Decompress(indata, endian);
+                            outdata = ModuledKosinski.Decompress(indata, endian);
+                            break;
+                        case CompressionType.Comper:
+                            outdata = Comper.Decompress(indata);
                             break;
                     }
                     break;
@@ -152,7 +161,10 @@ namespace SonicRetro.KensSharp.KensSharp
 							outdata = Saxman.Compress(Saxman.Decompress(indata), size);
                             break;
                         case CompressionType.ModuledKosinski:
-							outdata = ModuledKosinski.Compress(ModuledKosinski.Decompress(indata, endian), endian);
+                            outdata = ModuledKosinski.Compress(ModuledKosinski.Decompress(indata, endian), endian);
+                            break;
+                        case CompressionType.Comper:
+                            outdata = Comper.Compress(Comper.Decompress(indata));
                             break;
                     }
                     break;
@@ -223,6 +235,9 @@ namespace SonicRetro.KensSharp.KensSharp
         kosm = KosinskiModuled,
         mkos = KosinskiModuled,
         km = KosinskiModuled,
-        mk = KosinskiModuled
+        mk = KosinskiModuled,
+        Comper,
+        comp = Comper,
+        c = Comper
     }
 }

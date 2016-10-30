@@ -13,7 +13,8 @@ Arguments:
                             input file will be recompressed in place.
     -s, --same-filename     The output file name will be the same as the
                             input, with an extension indicating the type of
-                            compression: .kos, .eni, .nem, .sax, .kosm or .unc.
+                            compression: .kos, .eni, .nem, .sax, .kosm, .comp
+                            or .unc.
     -l, --little-endian     Uses little endian (Intel) byte order for Enigma
                             and Moduled Kosinski formats.
     -n, --no-size           Do not include size in Saxman compressed file.
@@ -28,3 +29,5 @@ Formats:
     ModuledKosinski,    The general-purpose Moduled Kosinski compression
     KosinskiModuled,    format used by Sonic 3 & Knuckles.
     mkos, kosm, mk, km
+    Comper, comp, c     The general-purpose Comper compression format,
+                        designed with an emphasis on decompression speed.

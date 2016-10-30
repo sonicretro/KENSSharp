@@ -153,6 +153,10 @@
                     case 5: // Saxman (without size)
                         Saxman.Compress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName, false);
                         break;
+
+                    case 6: // Comper
+                        Comper.Compress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName);
+                        break;
                 }
             }
             else if (this.decompressRadioButton.Checked)
@@ -181,6 +185,10 @@
 
                     case 5: // Saxman (without size)
                         Saxman.Decompress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName, (long)this.sizeParameterNumericUpDown.Value);
+                        break;
+
+                    case 6: // Comper
+                        Saxman.Decompress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName);
                         break;
                 }
             }

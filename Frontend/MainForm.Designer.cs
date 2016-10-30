@@ -122,7 +122,7 @@
             this.formatGroupBox.Controls.Add(this.formatListBox);
             this.formatGroupBox.Location = new System.Drawing.Point(12, 12);
             this.formatGroupBox.Name = "formatGroupBox";
-            this.formatGroupBox.Size = new System.Drawing.Size(132, 108);
+            this.formatGroupBox.Size = new System.Drawing.Size(132, 120);
             this.formatGroupBox.TabIndex = 0;
             this.formatGroupBox.TabStop = false;
             this.formatGroupBox.Text = "Format";
@@ -135,10 +135,11 @@
             "Enigma",
             "Nemesis",
             "Saxman (with size)",
-            "Saxman (without size)"});
+            "Saxman (without size)",
+            "Comper"});
             this.formatListBox.Location = new System.Drawing.Point(6, 20);
             this.formatListBox.Name = "formatListBox";
-            this.formatListBox.Size = new System.Drawing.Size(120, 82);
+            this.formatListBox.Size = new System.Drawing.Size(120, 95);
             this.formatListBox.TabIndex = 0;
             this.formatListBox.SelectedIndexChanged += new System.EventHandler(this.formatListBox_SelectedIndexChanged);
             // 
@@ -214,8 +215,8 @@
             // 
             // sourceFileSelector
             // 
-            this.sourceFileSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.sourceFileSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.sourceFileSelector.DefaultExt = "bin";
             this.sourceFileSelector.FileName = "";
             this.sourceFileSelector.Filter = "All Files (*.*)|*.*";
@@ -227,8 +228,8 @@
             // 
             // destinationFileSelector
             // 
-            this.destinationFileSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.destinationFileSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.destinationFileSelector.DefaultExt = "bin";
             this.destinationFileSelector.FileName = "";
             this.destinationFileSelector.Filter = "All Files (*.*)|*.*";
