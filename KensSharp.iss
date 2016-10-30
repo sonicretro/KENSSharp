@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{C6E49E8A-37DE-4CC1-8BD2-74EC835513DA}
 AppName=KensSharp
-AppVersion=1.0
+AppVersion=1.1
 ;AppVerName=KensSharp 1.0
 AppPublisher=Sonic Retro
 AppPublisherURL=http://sonicretro.org/
@@ -27,6 +27,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Source: "KensSharp\bin\Release\KensSharp.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "KensSharp\bin\Release\KensSharp.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "KensSharp\bin\Release\KensSharp.pdb"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Frontend\bin\Release\KensSharpFrontend.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Frontend\bin\Release\KensSharpFrontend.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Frontend\bin\Release\KensSharpFrontend.pdb"; DestDir: "{app}"; Flags: ignoreversion
 Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Common.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Common.pdb"; DestDir: "{app}"; Flags: ignoreversion
 Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Enigma.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -37,6 +40,8 @@ Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Nemesis.dll"; DestDir: "{app
 Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Nemesis.pdb"; DestDir: "{app}"; Flags: ignoreversion
 Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Saxman.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Saxman.pdb"; DestDir: "{app}"; Flags: ignoreversion
+Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Comper.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Comper.pdb"; DestDir: "{app}"; Flags: ignoreversion
 Check: Is64BitInstallMode; Source: "x64\Release\KensSharpShellExt.dll"; DestDir: "{app}"; DestName: "KensSharpShellExt64.dll"; Flags: ignoreversion
 Check: Is64BitInstallMode; Source: "x64\Release\KensSharpShellExt.pdb"; DestDir: "{app}"; DestName: "KensSharpShellExt64.pdb"; Flags: ignoreversion
 Source: "Release\KensSharpShellExt.dll"; DestDir: "{app}"; DestName: "KensSharpShellExt.dll"; Flags: ignoreversion
@@ -51,3 +56,11 @@ Root: HKCR32; Subkey: "CLSID\{{40376849-AF26-439e-AA72-E3B5E7298301}\InProcServe
 Check: Is64BitInstallMode; Root: HKCR64; Subkey: "CLSID\{{40376849-AF26-439e-AA72-E3B5E7298301}"; ValueType: string; ValueData: "KensSharp"; Flags: uninsdeletekey
 Check: Is64BitInstallMode; Root: HKCR64; Subkey: "CLSID\{{40376849-AF26-439e-AA72-E3B5E7298301}\InProcServer32"; ValueType: string; ValueData: "{app}\KensSharpShellExt64.dll"
 Check: Is64BitInstallMode; Root: HKCR64; Subkey: "CLSID\{{40376849-AF26-439e-AA72-E3B5E7298301}\InProcServer32"; ValueType: string; ValueName: "ThreadingModel"; ValueData: "Apartment"
+
+[Tasks]
+Name: starticon; Description: "Create a &start menu icon"
+Name: desktopicon; Description: "Create a &desktop icon"
+
+[Icons]
+Name: "{userprograms}\KensSharp Frontend"; Filename: "{app}\KensSharpFrontend.exe"; Tasks: starticon
+Name: "{userdesktop}\KensSharp Frontend"; Filename: "{app}\KensSharpFrontend.exe"; Tasks: desktopicon
