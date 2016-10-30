@@ -18,7 +18,7 @@
             }
 
             this.stream = stream;
-            this.littleEndianBits = true;
+            this.littleEndianBits = true;   // Default to true for backwards-compatibility
         }
 
         public override bool Put(bool bit)
@@ -27,7 +27,7 @@
             this.byteBuffer |= Convert.ToUInt16(bit);
             if (++this.waitingBits >= 16)
             {
-                BigEndian.Write2(this.stream, this.byteBuffer);
+                BigEndian.Write2(this.stream, this.littleEndianBits ? this.byteBuffer : reverseBits(this.byteBuffer));
                 this.waitingBits = 0;
                 this.byteBuffer = 0;
                 return true;
@@ -38,14 +38,11 @@
 
         public override bool Push(bool bit)
         {
-            if (littleEndianBits)
-                this.byteBuffer |= (ushort)(Convert.ToUInt16(bit) << this.waitingBits);
-            else
-                this.byteBuffer |= (ushort)(Convert.ToUInt16(bit) << (15-this.waitingBits));
+            this.byteBuffer |= (ushort)(Convert.ToUInt16(bit) << this.waitingBits);
 
             if (++this.waitingBits >= 16)
             {
-                BigEndian.Write2(this.stream, this.byteBuffer);
+                BigEndian.Write2(this.stream, this.littleEndianBits ? this.byteBuffer : reverseBits(this.byteBuffer));
                 this.waitingBits = 0;
                 this.byteBuffer = 0;
                 return true;
@@ -63,7 +60,7 @@
                     this.byteBuffer <<= 16 - this.waitingBits;
                 }
 
-                BigEndian.Write2(this.stream, this.byteBuffer);
+                BigEndian.Write2(this.stream, this.littleEndianBits ? this.byteBuffer : reverseBits(this.byteBuffer));
                 this.waitingBits = 0;
                 return true;
             }
@@ -77,7 +74,8 @@
             {
                 int delta = 16 - this.waitingBits;
                 this.waitingBits = (this.waitingBits + size) % 16;
-                BigEndian.Write2(this.stream, (ushort)((this.byteBuffer << delta) | (data >> this.waitingBits)));
+                ushort bits = (ushort)((this.byteBuffer << delta) | (data >> this.waitingBits));
+                BigEndian.Write2(this.stream, this.littleEndianBits ? bits : reverseBits(bits));
                 this.byteBuffer = data;
                 return true;
             }
@@ -86,6 +84,18 @@
             this.byteBuffer |= data;
             this.waitingBits += size;
             return false;
+        }
+
+        public override ushort reverseBits(ushort val)
+        {
+            ushort sz = 2 * 8;  // bit size; must be power of 2 
+            ushort mask = 0xFFFF;
+            while ((sz >>= 1) > 0)
+            {
+                mask ^= (ushort)(mask << sz);
+                val = (ushort)(((val >> sz) & mask) | ((val << sz) & ~mask));
+            }
+            return val;
         }
     }
 }
