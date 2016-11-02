@@ -129,20 +129,20 @@
         {
             UInt16BEInputBitStream bitStream = new UInt16BEInputBitStream(source, false, false);
 
-			for (;;)
+            for (;;)
             {
                 if (!bitStream.Pop())
                 {
                     // Symbolwise match
-					ushort word = BigEndian.Read2(source);
-					BigEndian.Write2(destination, word);
+                    ushort word = BigEndian.Read2(source);
+                    BigEndian.Write2(destination, word);
                 }
                 else
                 {
                     // Dictionary match
                     int distance = (0x100 - NeutralEndian.Read1(source)) * 2;
-					int length = NeutralEndian.Read1(source);
-					if (length == 0)
+                    int length = NeutralEndian.Read1(source);
+                    if (length == 0)
                     {
                         // End-of-stream marker
                         break;
