@@ -9,21 +9,16 @@
         private const long SlidingWindow = 256 * 2;         // *2 because Comper counts in words (16-bits)
         private const long RecurrenceLength = 256 * 2;
 
-        [SecuritySafeCritical]
-        internal static unsafe void Encode(Stream source, Stream destination)
+        internal static void Encode(Stream source, Stream destination)
         {
             long size = source.Length - source.Position;
             byte[] buffer = new byte[size];
             source.Read(buffer, 0, (int)size);
 
-            fixed (byte* ptr = buffer)
-            {
-                EncodeInternal(destination, ptr, SlidingWindow, RecurrenceLength, size);
-            }
+            EncodeInternal(destination, buffer, SlidingWindow, RecurrenceLength, size);
         }
 
-        [SecurityCritical]
-        private static unsafe void EncodeInternal(Stream destination, byte* buffer, long slidingWindow, long recLength, long size)
+        private static void EncodeInternal(Stream destination, byte[] buffer, long slidingWindow, long recLength, long size)
         {
             UInt16BEOutputBitStream bitStream = new UInt16BEOutputBitStream(destination, false);
             MemoryStream data = new MemoryStream();
