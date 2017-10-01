@@ -188,7 +188,7 @@
                         break;
 
                     case 6: // Comper
-                        Saxman.Decompress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName);
+                        Comper.Decompress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName);
                         break;
                 }
             }
