@@ -3,13 +3,13 @@
     using System;
     using System.IO;
 
-    public sealed class UInt16LEInputBitStream : InputBitStream<ushort>
+    public sealed class UInt16BENonEarlyBEInputBitStream : InputBitStream<ushort>
     {
         private Stream stream;
         private int remainingBits;
         private ushort byteBuffer;
 
-        public UInt16LEInputBitStream(Stream stream)
+        public UInt16BENonEarlyBEInputBitStream(Stream stream)
         {
             if (stream == null)
             {
@@ -18,26 +18,27 @@
 
             this.stream = stream;
 
-            this.remainingBits = 16;
-            this.byteBuffer = LittleEndian.Read2(stream);
+            this.remainingBits = 0;
         }
 
         public override bool Get()
         {
             this.CheckBuffer();
             --this.remainingBits;
-            ushort bit = (ushort)(this.byteBuffer & (1 << this.remainingBits));
+            ushort bit = (ushort)(this.byteBuffer & (0x8000 >> this.remainingBits));
             this.byteBuffer ^= bit; // clear the bit
             return bit != 0;
         }
 
         public override bool Pop()
         {
-            --this.remainingBits;
-            ushort bit = (ushort)(this.byteBuffer & 1);
-            this.byteBuffer >>= 1;
-
             this.CheckBuffer();
+
+            --this.remainingBits;
+            ushort bit;
+            
+            bit = (ushort)(this.byteBuffer & 0x8000);
+            this.byteBuffer <<= 1;
 
             return bit != 0;
         }
@@ -48,17 +49,17 @@
             if (this.remainingBits < count)
             {
                 int delta = count - this.remainingBits;
-                ushort lowBits = (ushort)(this.byteBuffer << delta);
-                this.byteBuffer = LittleEndian.Read2(stream);
+                ushort lowBits = (ushort)(this.byteBuffer >> delta);
+                this.byteBuffer = BigEndian.Read2(stream);
                 this.remainingBits = 16 - delta;
-                ushort highBits = (ushort)(this.byteBuffer >> this.remainingBits);
-                this.byteBuffer ^= (ushort)(highBits << this.remainingBits);
+                ushort highBits = (ushort)(this.byteBuffer << this.remainingBits);
+                this.byteBuffer ^= (ushort)(highBits >> this.remainingBits);
                 return (ushort)(lowBits | highBits);
             }
 
             this.remainingBits -= count;
-            ushort bits = (ushort)(this.byteBuffer >> this.remainingBits);
-            this.byteBuffer ^= (ushort)(bits << this.remainingBits);
+            ushort bits = (ushort)(this.byteBuffer << this.remainingBits);
+            this.byteBuffer ^= (ushort)(bits >> this.remainingBits);
             return bits;
         }
 
@@ -66,7 +67,7 @@
         {
             if (this.remainingBits == 0)
             {
-                this.byteBuffer = LittleEndian.Read2(stream);
+                this.byteBuffer = BigEndian.Read2(stream);
                 this.remainingBits = 16;
             }
         }

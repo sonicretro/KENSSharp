@@ -3,13 +3,13 @@
     using System;
     using System.IO;
 
-    public sealed class UInt8OutputBitStream : OutputBitStream<byte>
+    public sealed class UInt8BEOutputBitStream : OutputBitStream<byte>
     {
         private Stream stream;
         private int waitingBits;
         private byte byteBuffer;
 
-        public UInt8OutputBitStream(Stream stream)
+        public UInt8BEOutputBitStream(Stream stream)
         {
             if (stream == null)
             {
@@ -21,8 +21,11 @@
 
         public override bool Put(bool bit)
         {
-            this.byteBuffer <<= 1;
-            this.byteBuffer |= Convert.ToByte(bit);
+            this.byteBuffer >>= 1;
+
+            if (bit)
+                this.byteBuffer |= 0x80;
+
             if (++this.waitingBits >= 8)
             {
                 NeutralEndian.Write1(this.stream, this.byteBuffer);
@@ -36,7 +39,9 @@
 
         public override bool Push(bool bit)
         {
-            this.byteBuffer |= (byte)(Convert.ToByte(bit) << this.waitingBits);
+            if (bit)
+                this.byteBuffer |= (byte)(0x80 >> this.waitingBits);
+
             if (++this.waitingBits >= 8)
             {
                 NeutralEndian.Write1(this.stream, this.byteBuffer);
@@ -54,7 +59,7 @@
             {
                 if (!unchanged)
                 {
-                    this.byteBuffer <<= 8 - this.waitingBits;
+                    this.byteBuffer >>= 8 - this.waitingBits;
                 }
 
                 NeutralEndian.Write1(this.stream, this.byteBuffer);
@@ -67,19 +72,7 @@
 
         public override bool Write(byte data, int size)
         {
-            if (this.waitingBits + size >= 8)
-            {
-                int delta = 8 - this.waitingBits;
-                this.waitingBits = (this.waitingBits + size) % 8;
-                byte bits = (byte)((this.byteBuffer << delta) | (data >> this.waitingBits));
-                NeutralEndian.Write1(this.stream, bits);
-                this.byteBuffer = data;
-                return true;
-            }
-
-            this.byteBuffer <<= size;
-            this.byteBuffer |= data;
-            this.waitingBits += size;
+            // Not implemented
             return false;
         }
     }

@@ -3,13 +3,13 @@
     using System;
     using System.IO;
 
-    public sealed class UInt16BEOutputBitStream : OutputBitStream<ushort>
+    public sealed class UInt16BEBEOutputBitStream : OutputBitStream<ushort>
     {
         private Stream stream;
         private int waitingBits;
         private ushort byteBuffer;
 
-        public UInt16BEOutputBitStream(Stream stream)
+        public UInt16BEBEOutputBitStream(Stream stream)
         {
             if (stream == null)
             {
@@ -21,8 +21,11 @@
 
         public override bool Put(bool bit)
         {
-            this.byteBuffer <<= 1;
-            this.byteBuffer |= Convert.ToUInt16(bit);
+            this.byteBuffer >>= 1;
+
+            if (bit)
+                this.byteBuffer |= 0x8000;
+
             if (++this.waitingBits >= 16)
             {
                 BigEndian.Write2(this.stream, this.byteBuffer);
@@ -36,7 +39,8 @@
 
         public override bool Push(bool bit)
         {
-            this.byteBuffer |= (ushort)(Convert.ToUInt16(bit) << this.waitingBits);
+            if (bit)
+                this.byteBuffer |= (ushort)(0x8000 >> this.waitingBits);
 
             if (++this.waitingBits >= 16)
             {
@@ -55,7 +59,7 @@
             {
                 if (!unchanged)
                 {
-                    this.byteBuffer <<= 16 - this.waitingBits;
+                    this.byteBuffer >>= 16 - this.waitingBits;
                 }
 
                 BigEndian.Write2(this.stream, this.byteBuffer);
@@ -68,19 +72,6 @@
 
         public override bool Write(ushort data, int size)
         {
-            if (this.waitingBits + size >= 16)
-            {
-                int delta = 16 - this.waitingBits;
-                this.waitingBits = (this.waitingBits + size) % 16;
-                ushort bits = (ushort)((this.byteBuffer << delta) | (data >> this.waitingBits));
-                BigEndian.Write2(this.stream, bits);
-                this.byteBuffer = data;
-                return true;
-            }
-
-            this.byteBuffer <<= size;
-            this.byteBuffer |= data;
-            this.waitingBits += size;
             return false;
         }
     }

@@ -35,7 +35,9 @@
     <Compile Include="BigEndian.cs" />
     <Compile Include="CompressionException.cs" />
     <Compile Include="Endianness.cs" />
+    <Compile Include="UInt16BENonEarlyBEInputBitStream.cs" />
     <Compile Include="UInt16BEInputBitStream.cs" />
+    <Compile Include="UInt16BEBEOutputBitStream.cs" />
     <Compile Include="UInt16BEOutputBitStream.cs" />
     <Compile Include="LittleEndian.cs" />
     <Compile Include="NeutralEndian.cs" />
@@ -51,7 +53,9 @@
     <Compile Include="UInt16LEOutputBitStream.cs" />
     <Compile Include="InputBitStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UInt8NonEarlyBEInputBitStream.cs" />
     <Compile Include="UInt8InputBitStream.cs" />
+    <Compile Include="UInt8BEOutputBitStream.cs" />
     <Compile Include="UInt8OutputBitStream.cs" />
   </ItemGroup>
   <ItemGroup>

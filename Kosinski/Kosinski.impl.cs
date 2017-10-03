@@ -72,7 +72,7 @@
 
         private static void EncodeInternal(Stream destination, byte[] buffer, long pos, long slidingWindow, long recLength, long size)
         {
-            UInt16LEOutputBitStream bitStream = new UInt16LEOutputBitStream(destination, true);
+            UInt16LEOutputBitStream bitStream = new UInt16LEOutputBitStream(destination);
             MemoryStream data = new MemoryStream();
 
             if (size > 0)
@@ -225,7 +225,7 @@
 
         private static void DecodeInternal(Stream source, Stream destination, ref long decompressedBytes)
         {
-            UInt16LEInputBitStream bitStream = new UInt16LEInputBitStream(source, true, true);
+            UInt16LEInputBitStream bitStream = new UInt16LEInputBitStream(source);
 
             for (;;)
             {

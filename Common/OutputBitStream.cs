@@ -12,7 +12,5 @@
     public abstract class OutputBitStream<T> : OutputBitStream where T : struct
     {
         public abstract bool Write(T data, int size);
-        
-        public abstract T reverseBits(T val);
     }
 }

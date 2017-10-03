@@ -10,7 +10,5 @@
     public abstract class InputBitStream<T> : InputBitStream where T : struct
     {
         public abstract T Read(int count);
-
-        public abstract T reverseBits(T val);
     }
 }
