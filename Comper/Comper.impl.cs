@@ -12,7 +12,7 @@
         internal static void Encode(Stream source, Stream destination)
         {
             long size = source.Length - source.Position;
-            byte[] buffer = new byte[size];
+            byte[] buffer = new byte[size + (size & 1)];
             source.Read(buffer, 0, (int)size);
 
             EncodeInternal(destination, buffer, SlidingWindow, RecurrenceLength, size);
