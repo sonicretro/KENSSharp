@@ -83,6 +83,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Kosinski+\Kosinski+.csproj">
+      <Project>{03cb2911-cf66-4709-96ff-adff25f0fee9}</Project>
+      <Name>Kosinski+</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{2A97FB96-68CF-4DF8-BEF7-BF14ECDDE629}</Project>
       <Name>Common</Name>

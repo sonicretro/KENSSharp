@@ -111,7 +111,7 @@
 
         private void SetEndiannessParameterEnabled()
         {
-            bool enableEndiannessParameter = this.formatListBox.SelectedIndex == 1 || this.formatListBox.SelectedIndex == 2;
+            bool enableEndiannessParameter = this.formatListBox.SelectedIndex == 1 || this.formatListBox.SelectedIndex == 2 || this.formatListBox.SelectedIndex == 8;
             this.endiannessLabel.Enabled = enableEndiannessParameter;
             this.endiannessComboBox.Enabled = enableEndiannessParameter;
         }
@@ -157,6 +157,14 @@
                     case 6: // Comper
                         Comper.Compress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName);
                         break;
+
+                    case 7: // Kosinski+
+                        KosinskiPlus.Compress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName);
+                        break;
+
+                    case 8: // Moduled Kosinski+
+                        ModuledKosinskiPlus.Compress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName, (Endianness)this.endiannessComboBox.SelectedIndex);
+                        break;
                 }
             }
             else if (this.decompressRadioButton.Checked)
@@ -189,6 +197,14 @@
 
                     case 6: // Comper
                         Comper.Decompress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName);
+                        break;
+
+                    case 7: // Kosinski+
+                        KosinskiPlus.Decompress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName);
+                        break;
+
+                    case 8: // Moduled Kosinski+
+                        ModuledKosinskiPlus.Decompress(this.sourceFileSelector.FileName, this.destinationFileSelector.FileName, (Endianness)this.endiannessComboBox.SelectedIndex);
                         break;
                 }
             }

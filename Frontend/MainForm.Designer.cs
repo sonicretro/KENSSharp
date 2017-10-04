@@ -122,7 +122,7 @@
             this.formatGroupBox.Controls.Add(this.formatListBox);
             this.formatGroupBox.Location = new System.Drawing.Point(12, 12);
             this.formatGroupBox.Name = "formatGroupBox";
-            this.formatGroupBox.Size = new System.Drawing.Size(132, 120);
+            this.formatGroupBox.Size = new System.Drawing.Size(132, 134);
             this.formatGroupBox.TabIndex = 0;
             this.formatGroupBox.TabStop = false;
             this.formatGroupBox.Text = "Format";
@@ -136,10 +136,12 @@
             "Nemesis",
             "Saxman (with size)",
             "Saxman (without size)",
-            "Comper"});
+            "Comper",
+            "Kosinski+",
+            "Moduled Kosinski+"});
             this.formatListBox.Location = new System.Drawing.Point(6, 20);
             this.formatListBox.Name = "formatListBox";
-            this.formatListBox.Size = new System.Drawing.Size(120, 95);
+            this.formatListBox.Size = new System.Drawing.Size(120, 108);
             this.formatListBox.TabIndex = 0;
             this.formatListBox.SelectedIndexChanged += new System.EventHandler(this.formatListBox_SelectedIndexChanged);
             // 
