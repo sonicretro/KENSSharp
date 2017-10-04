@@ -72,14 +72,14 @@
 
         private static void EncodeInternal(Stream destination, byte[] buffer, long pos, long slidingWindow, long recLength, long size)
         {
-            UInt8BEOutputBitStream bitStream = new UInt8BEOutputBitStream(destination);
+            UInt8NonEarlyBEOutputBitStream bitStream = new UInt8NonEarlyBEOutputBitStream(destination);
             MemoryStream data = new MemoryStream();
 
             if (size > 0)
             {
                 long bPointer = 1, iOffset = 0;
-                NeutralEndian.Write1(data, buffer[pos]);
                 bitStream.Push(true);
+                NeutralEndian.Write1(data, buffer[pos]);
 
                 while (bPointer < size)
                 {
@@ -110,13 +110,13 @@
 
                     if (iCount == 1)
                     {
-                        NeutralEndian.Write1(data, buffer[pos + bPointer]);
                         Push(bitStream, true, destination, data);
+                        NeutralEndian.Write1(data, buffer[pos + bPointer]);
                     }
                     else if (iCount == 2 && bPointer - iOffset > 256)
                     {
-                        NeutralEndian.Write1(data, buffer[pos + bPointer]);
                         Push(bitStream, true, destination, data);
+                        NeutralEndian.Write1(data, buffer[pos + bPointer]);
                         --iCount;
                     }
                     else if (iCount < 6 && bPointer - iOffset <= 256)
@@ -124,12 +124,14 @@
                         Push(bitStream, false, destination, data);
                         Push(bitStream, false, destination, data);
                         Push(bitStream, (((iCount - 2) >> 1) & 1) != 0, destination, data);
-                        NeutralEndian.Write1(data, (byte)(~(bPointer - iOffset - 1)));
                         Push(bitStream, ((iCount - 2) & 1) != 0, destination, data);
+                        NeutralEndian.Write1(data, (byte)(~(bPointer - iOffset - 1)));
                     }
                     else
                     {
                         Push(bitStream, false, destination, data);
+                        Push(bitStream, true, destination, data);
+
                         long off = bPointer - iOffset - 1;
                         ushort info = (ushort)(~((off << 8) | (off >> 5)) & 0xFFF8);
 
@@ -143,8 +145,6 @@
                             BigEndian.Write2(data, info);
                             NeutralEndian.Write1(data, (byte)(iCount - 9));
                         }
-
-                        Push(bitStream, true, destination, data);
                     }
 
                     bPointer += iCount;
@@ -152,18 +152,18 @@
             }
 
             Push(bitStream, false, destination, data);
+            Push(bitStream, true, destination, data);
+
             NeutralEndian.Write1(data, 0);
             NeutralEndian.Write1(data, 0xF0);
             NeutralEndian.Write1(data, 0);
-            Push(bitStream, true, destination, data);
-
             bitStream.Flush(true);
 
             byte[] bytes = data.ToArray();
             destination.Write(bytes, 0, bytes.Length);
         }
 
-        private static void Push(UInt8BEOutputBitStream bitStream, bool bit, Stream destination, MemoryStream data)
+        private static void Push(UInt8NonEarlyBEOutputBitStream bitStream, bool bit, Stream destination, MemoryStream data)
         {
             if (bitStream.Push(bit))
             {

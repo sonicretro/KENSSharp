@@ -3,13 +3,13 @@
     using System;
     using System.IO;
 
-    public sealed class UInt8BEOutputBitStream : OutputBitStream<byte>
+    public sealed class UInt8NonEarlyBEOutputBitStream : OutputBitStream<byte>
     {
         private Stream stream;
         private int waitingBits;
         private byte byteBuffer;
 
-        public UInt8BEOutputBitStream(Stream stream)
+        public UInt8NonEarlyBEOutputBitStream(Stream stream)
         {
             if (stream == null)
             {
@@ -21,36 +21,44 @@
 
         public override bool Put(bool bit)
         {
+            bool flushed = false;
+
+            if (this.waitingBits >= 8)
+            {
+                NeutralEndian.Write1(this.stream, this.byteBuffer);
+                this.waitingBits = 0;
+                this.byteBuffer = 0;
+                flushed = true;
+            }
+
             this.byteBuffer >>= 1;
 
             if (bit)
                 this.byteBuffer |= 0x80;
 
-            if (++this.waitingBits >= 8)
-            {
-                NeutralEndian.Write1(this.stream, this.byteBuffer);
-                this.waitingBits = 0;
-                this.byteBuffer = 0;
-                return true;
-            }
+            ++this.waitingBits;
 
-            return false;
+            return flushed;
         }
 
         public override bool Push(bool bit)
         {
-            if (bit)
-                this.byteBuffer |= (byte)(0x80 >> this.waitingBits);
+            bool flushed = false;
 
-            if (++this.waitingBits >= 8)
+            if (this.waitingBits >= 8)
             {
                 NeutralEndian.Write1(this.stream, this.byteBuffer);
                 this.waitingBits = 0;
                 this.byteBuffer = 0;
-                return true;
+                flushed = true;
             }
 
-            return false;
+            if (bit)
+                this.byteBuffer |= (byte)(0x80 >> this.waitingBits);
+
+            ++this.waitingBits;
+
+            return flushed;
         }
 
         public override bool Flush(bool unchanged)

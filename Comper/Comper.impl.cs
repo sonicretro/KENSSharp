@@ -20,17 +20,15 @@
 
         private static void EncodeInternal(Stream destination, byte[] buffer, long slidingWindow, long recLength, long size)
         {
-            UInt16BEBEOutputBitStream bitStream = new UInt16BEBEOutputBitStream(destination);
+            UInt16BENonEarlyBEOutputBitStream bitStream = new UInt16BENonEarlyBEOutputBitStream(destination);
             MemoryStream data = new MemoryStream();
 
             if (size > 0)
             {
                 long bPointer = 2, longestMatchOffset = 0;
-                // Write initial "match" (always a symbol)
-                //bitStream.Push(false);    // Early descriptor (as seen in Kosinski)
+                bitStream.Push(false);
                 NeutralEndian.Write1(data, buffer[0]);
                 NeutralEndian.Write1(data, buffer[1]);
-                bitStream.Push(false);
 
                 while (bPointer < size)
                 {
@@ -67,45 +65,33 @@
                     if (iCount == 1)
                     {
                         // Symbolwise match
-                        //Push(bitStream, false, destination, data);    // Early descriptor (as seen in Kosinski)
+                        Push(bitStream, false, destination, data);
                         NeutralEndian.Write1(data, buffer[bPointer]);
                         NeutralEndian.Write1(data, buffer[bPointer + 1]);
-                        Push(bitStream, false, destination, data);      // Non-early descriptor
                     }
                     else
                     {
                         // Dictionary match
-                        //Push(bitStream, true, destination, data); // Early descriptor (as seen in Kosinski)
+                        Push(bitStream, true, destination, data);
                         NeutralEndian.Write1(data, (byte)(iOffset));
                         NeutralEndian.Write1(data, (byte)(iCount - 1));
-                        Push(bitStream, true, destination, data);   // Non-early descriptor
                     }
 
                     bPointer += iCount * 2;   // iCount counts in words (16-bits), so we correct it to bytes (8-bits) here
                 }
             }
 
-            // Early descriptor only
-            //Push(bitStream, true, destination, data);
-
-            // If the bit stream was just flushed, write an empty bit stream that will be read just before the end-of-data
-            // sequence below.
-            /*if (!bitStream.HasWaitingBits)
-            {
-                NeutralEndian.Write1(data, 0);
-                NeutralEndian.Write1(data, 0);
-            }*/
+            Push(bitStream, true, destination, data);
 
             NeutralEndian.Write1(data, 0);
             NeutralEndian.Write1(data, 0);
-            Push(bitStream, true, destination, data);   // Non-early descriptor
             bitStream.Flush(true);
 
             byte[] bytes = data.ToArray();
             destination.Write(bytes, 0, bytes.Length);
         }
 
-        private static void Push(UInt16BEBEOutputBitStream bitStream, bool bit, Stream destination, MemoryStream data)
+        private static void Push(UInt16BENonEarlyBEOutputBitStream bitStream, bool bit, Stream destination, MemoryStream data)
         {
             if (bitStream.Push(bit))
             {

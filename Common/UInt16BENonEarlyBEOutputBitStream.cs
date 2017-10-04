@@ -3,13 +3,13 @@
     using System;
     using System.IO;
 
-    public sealed class UInt16BEBEOutputBitStream : OutputBitStream<ushort>
+    public sealed class UInt16BENonEarlyBEOutputBitStream : OutputBitStream<ushort>
     {
         private Stream stream;
         private int waitingBits;
         private ushort byteBuffer;
 
-        public UInt16BEBEOutputBitStream(Stream stream)
+        public UInt16BENonEarlyBEOutputBitStream(Stream stream)
         {
             if (stream == null)
             {
@@ -21,36 +21,44 @@
 
         public override bool Put(bool bit)
         {
+            bool flushed = false;
+
+            if (this.waitingBits >= 16)
+            {
+                BigEndian.Write2(this.stream, this.byteBuffer);
+                this.waitingBits = 0;
+                this.byteBuffer = 0;
+                flushed = true;
+            }
+
             this.byteBuffer >>= 1;
 
             if (bit)
                 this.byteBuffer |= 0x8000;
 
-            if (++this.waitingBits >= 16)
-            {
-                BigEndian.Write2(this.stream, this.byteBuffer);
-                this.waitingBits = 0;
-                this.byteBuffer = 0;
-                return true;
-            }
+            ++this.waitingBits;
 
-            return false;
+            return flushed;
         }
 
         public override bool Push(bool bit)
         {
-            if (bit)
-                this.byteBuffer |= (ushort)(0x8000 >> this.waitingBits);
+            bool flushed = false;
 
-            if (++this.waitingBits >= 16)
+            if (this.waitingBits >= 16)
             {
                 BigEndian.Write2(this.stream, this.byteBuffer);
                 this.waitingBits = 0;
                 this.byteBuffer = 0;
-                return true;
+                flushed = true;
             }
 
-            return false;
+            if (bit)
+                this.byteBuffer |= (ushort)(0x8000 >> this.waitingBits);
+
+            ++this.waitingBits;
+
+            return flushed;
         }
 
         public override bool Flush(bool unchanged)
