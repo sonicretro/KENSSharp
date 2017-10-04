@@ -13,8 +13,8 @@ Arguments:
                             input file will be recompressed in place.
     -s, --same-filename     The output file name will be the same as the
                             input, with an extension indicating the type of
-                            compression: .kos, .eni, .nem, .sax, .kosm, .comp
-                            or .unc.
+                            compression: .kos, .eni, .nem, .sax, .kosm,
+                            .comp, .kosp, .kosm or .unc.
     -l, --little-endian     Uses little endian (Intel) byte order for Enigma
                             and Moduled Kosinski formats.
     -n, --no-size           Do not include size in Saxman compressed file.
@@ -31,3 +31,10 @@ Formats:
     mkos, kosm, mk, km
     Comper, comp, c     The general-purpose Comper compression format,
                         designed with an emphasis on decompression speed.
+    KosinskiPlus, kosp, An enhanced, but binary-incompatible, version of
+    kp                  Kosinski, Kosinski+, made to be faster while also
+                        theoretically producing smaller files.
+    ModuledKosinskiPlus,A moduled variant of Kosinski+.
+    KosinskiPlusModuled,
+    mkosp, kospm, mkp,
+    kpm
