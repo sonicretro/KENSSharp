@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{C6E49E8A-37DE-4CC1-8BD2-74EC835513DA}
 AppName=KensSharp
-AppVersion=1.1
+AppVersion=1.2
 ;AppVerName=KensSharp 1.0
 AppPublisher=Sonic Retro
 AppPublisherURL=http://sonicretro.org/
@@ -15,7 +15,7 @@ AppSupportURL=http://sonicretro.org/
 AppUpdatesURL=http://sonicretro.org/
 DefaultDirName={pf}\KensSharp
 AllowNoIcons=yes
-OutputBaseFilename=setup
+OutputBaseFilename=KensSharpSetup
 Compression=lzma
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
@@ -36,6 +36,8 @@ Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Enigma.dll"; DestDir: "{app}
 Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Enigma.pdb"; DestDir: "{app}"; Flags: ignoreversion
 Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Kosinski.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Kosinski.pdb"; DestDir: "{app}"; Flags: ignoreversion
+Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Kosinski+.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Kosinski+.pdb"; DestDir: "{app}"; Flags: ignoreversion
 Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Nemesis.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Nemesis.pdb"; DestDir: "{app}"; Flags: ignoreversion
 Source: "KensSharp\bin\Release\SonicRetro.KensSharp.Saxman.dll"; DestDir: "{app}"; Flags: ignoreversion
