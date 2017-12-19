@@ -59,13 +59,6 @@
                     break;
                 }
 
-                // Padding between modules
-                long paddingEnd = (((destination.Position - 2) + 0xF) & ~0xF) + 2;
-                while (destination.Position < paddingEnd)
-                {
-                    destination.WriteByte(0);
-                }
-
                 remainingSize = Math.Min(0x1000L, size - compBytes);
             }
         }
@@ -198,19 +191,6 @@
                 if (decompressedBytes >= fullSize)
                 {
                     break;
-                }
-
-                // Skip the padding between modules
-                int b;
-                long paddingEnd = (((source.Position - 2) + 0xF) & ~0xF) + 2;
-                while (source.Position < paddingEnd)
-                {
-                    b = source.ReadByte();
-
-                    if (b == -1)
-                    {
-                        throw new EndOfStreamException();
-                    }
                 }
             }
         }
