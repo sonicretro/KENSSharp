@@ -6,14 +6,14 @@
 
     public static partial class Saxman
     {
-        private static void Encode(Stream input, Stream output, bool withSize)
+        private static void Encode(Stream input, Stream output, bool with_size)
         {
-            long inputSize = input.Length - input.Position;
-            byte[] inputBuffer = new byte[inputSize];
-            input.Read(inputBuffer, 0, (int)inputSize);
+            long input_size = input.Length - input.Position;
+            byte[] input_buffer = new byte[input_size];
+            input.Read(input_buffer, 0, (int)input_size);
 
             long outputInitialPosition = output.Position;
-            if (withSize)
+            if (with_size)
             {
                 output.Seek(2, SeekOrigin.Current);
             }
@@ -21,53 +21,54 @@
             List<byte> data = new List<byte>();
             UInt8OutputBitStream bitStream = new UInt8OutputBitStream(output);
 
-            long inputPointer = 0;
-            while (inputPointer < inputSize)
+            long input_pointer = 0;
+            while (input_pointer < input_size)
             {
                 // The maximum recurrence length that can be encoded is 0x12
-                long maximumRecurrenceLength = Math.Min(inputSize - inputPointer, 0x12);
+                // Of course, if the remaining file is smaller, cap to that instead
+                long maximum_match_length = Math.Min(input_size - input_pointer, 0x12);
+                // The furthest back Saxman can address is 0x1000 bytes
+                // Again, if there's less than 0x1000 bytes of data available, then cap at that instead
+                long maximum_backsearch = Math.Min(input_pointer, 0x1000);
 
-                // Minimal recurrence length, will contain the total recurrence length
-                long offset = inputPointer;
-                long longestBackreferenceLength = 1;
-                long i = Math.Max(inputPointer - 0x1000, -0x12);
+                // These are our default values for the longest match found
+                long longest_match_offset = input_pointer;	// This one doesn't really need initialising, but it does shut up some moronic warnings
+                long longest_match_length = 1;
 
-                // First, check if we can encode a zero fill.
-                if (i == -0x12)
+                // First, look for dictionary matches
+                for (long backsearch_pointer = input_pointer - 1; backsearch_pointer >= input_pointer - maximum_backsearch; --backsearch_pointer)
                 {
-                    long j = 0;
-                    while (inputBuffer[inputPointer + j] == 0 && ++j < 0x12)
-                    {
-                    }
+                    long match_length = 0;
+                    while (input_buffer[backsearch_pointer + match_length] == input_buffer[input_pointer + match_length] && ++match_length < maximum_match_length) ;
 
-                    if (j > 1)
+                    if (match_length > longest_match_length)
                     {
-                        longestBackreferenceLength = j;
-                        offset = -0x12;
+                        longest_match_length = match_length;
+                        longest_match_offset = backsearch_pointer;
                     }
-
-                    i = 0;
                 }
 
-                while (i < inputPointer)
+                // Then, look for zero-fill matches
+                if (input_pointer < 0xFFF)  // Saxman cannot perform zero-fills past the first 0xFFF bytes (it relies on some goofy logic in the decompressor)
                 {
-                    long j = 0;
-                    while (inputBuffer[i + j] == inputBuffer[inputPointer + j] && ++j < maximumRecurrenceLength)
-                    {
-                    }
+                    long match_length = 0;
+                    while (input_buffer[input_pointer + match_length] == 0 && ++match_length < maximum_match_length) ;
 
-                    if (j > longestBackreferenceLength)
+                    if (match_length > longest_match_length)
                     {
-                        longestBackreferenceLength = j;
-                        offset = i;
+                        longest_match_length = match_length;
+                        // Saxman detects zero-fills by checking if the dictionary reference offset is somehow
+                        // pointing to *after* the decompressed data, so we set it to the highest possible value here
+                        longest_match_offset = 0xFFF;
                     }
-
-                    i++;
                 }
 
-                if (longestBackreferenceLength == 1 || longestBackreferenceLength == 2)
+                // We cannot compress runs shorter than three bytes
+                // (and even if we could, it would take more space than storing uncompressed)
+                if (longest_match_length < 3)
                 {
-                    data.Add(inputBuffer[inputPointer]);
+                    // Uncompressed
+                    data.Add(input_buffer[input_pointer]);
                     if (bitStream.Push(true))
                     {
                         byte[] dataArray = data.ToArray();
@@ -75,14 +76,14 @@
                         data.Clear();
                     }
 
-                    longestBackreferenceLength = 1;
+                    longest_match_length = 1;
                 }
                 else
                 {
-                    long iOffset = (offset & 0xfff) - 0x12;
-                    ushort word = (ushort)(((iOffset & 0xFF) << 8) | ((iOffset & 0xF00) >> 4) | ((longestBackreferenceLength - 3) & 0x0F));
-                    data.Add((byte)(word >> 8));
-                    data.Add((byte)(word & 0xff));
+                    // Compressed
+                    long match_offset_adjusted = longest_match_offset - 0x12;	// I don't think there's any reason for this, the format's just stupid
+                    data.Add((byte)(match_offset_adjusted & 0xFF));
+                    data.Add((byte)(((match_offset_adjusted & 0xF00) >> 4) | ((longest_match_length - 3) & 0x0F)));
                     if (bitStream.Push(false))
                     {
                         byte[] dataArray = data.ToArray();
@@ -91,7 +92,7 @@
                     }
                 }
 
-                inputPointer += longestBackreferenceLength;
+                input_pointer += longest_match_length;
             }
 
             {
@@ -101,7 +102,7 @@
                 data.Clear();
             }
 
-            if (withSize)
+            if (with_size)
             {
                 ushort size = (ushort)(output.Position - 2);
                 output.Seek(outputInitialPosition, SeekOrigin.Begin);
