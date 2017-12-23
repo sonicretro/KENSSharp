@@ -11,7 +11,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Sonic Retro & contributors")]
 [assembly: AssemblyProduct("KENSSharp")]
-[assembly: AssemblyCopyright("Copyright © Sonic Retro & contributors 2011")]
+[assembly: AssemblyCopyright("Copyright © Sonic Retro & contributors 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
