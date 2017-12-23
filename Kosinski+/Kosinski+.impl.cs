@@ -18,7 +18,7 @@
             EncodeInternal(destination, buffer, 0, SlidingWindow, RecurrenceLength, size);
         }
 
-        internal static void Encode(Stream source, Stream destination, Endianness headerEndianness)
+        internal static void EncodeModuled(Stream source, Stream destination)
         {
             long size = source.Length - source.Position;
             byte[] buffer = new byte[size];
@@ -38,14 +38,7 @@
                 remainingSize = 0x1000;
             }
 
-            if (headerEndianness == Endianness.BigEndian)
-            {
-                BigEndian.Write2(destination, (ushort)size);
-            }
-            else
-            {
-                LittleEndian.Write2(destination, (ushort)size);
-            }
+            BigEndian.Write2(destination, (ushort)size);
 
             for (; ; )
             {

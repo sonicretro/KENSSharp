@@ -130,7 +130,7 @@ namespace SonicRetro.KensSharp.KensSharp
                             outdata = KosinskiPlus.Compress(indata);
                             break;
                         case CompressionType.ModuledKosinskiPlus:
-                            outdata = ModuledKosinskiPlus.Compress(indata, endian);
+                            outdata = ModuledKosinskiPlus.Compress(indata);
                             break;
                     }
                     break;
@@ -159,7 +159,7 @@ namespace SonicRetro.KensSharp.KensSharp
                             outdata = KosinskiPlus.Decompress(indata);
                             break;
                         case CompressionType.ModuledKosinskiPlus:
-                            outdata = ModuledKosinskiPlus.Decompress(indata, endian);
+                            outdata = ModuledKosinskiPlus.Decompress(indata);
                             break;
                     }
                     break;
@@ -188,7 +188,7 @@ namespace SonicRetro.KensSharp.KensSharp
                             outdata = KosinskiPlus.Compress(KosinskiPlus.Decompress(indata));
                             break;
                         case CompressionType.ModuledKosinskiPlus:
-                            outdata = ModuledKosinskiPlus.Compress(ModuledKosinskiPlus.Decompress(indata, endian), endian);
+                            outdata = ModuledKosinskiPlus.Compress(ModuledKosinskiPlus.Decompress(indata));
                             break;
                     }
                     break;

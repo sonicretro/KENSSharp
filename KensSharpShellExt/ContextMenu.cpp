@@ -30,9 +30,7 @@ wchar_t *itemargs[] = {
 	L"-dkp",
 	L"-ckp",
 	L"-dkpm",
-	L"-ckpm",
-	L"-dkpm -l",
-	L"-ckpm -l"
+	L"-ckpm"
 };
 
 struct iteminfo { int id; wchar_t *text; iteminfo *subitems; };
@@ -66,7 +64,7 @@ iteminfo saxmenu[] = {
 endianmenu(kosm);
 defaultmenu(comp);
 defaultmenu(kosp);
-endianmenu(kospm);
+defaultmenu(kospm);
 
 int maxid = curid;
 

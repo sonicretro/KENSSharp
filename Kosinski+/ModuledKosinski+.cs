@@ -5,123 +5,53 @@
 
     public static class ModuledKosinskiPlus
     {
-        public static byte[] Decompress(string sourceFilePath, Endianness headerEndianness)
+        public static byte[] Decompress(string sourceFilePath)
         {
-            ValidateEndianness(headerEndianness);
             using (FileStream input = File.OpenRead(sourceFilePath))
             {
                 using (MemoryStream output = new MemoryStream())
                 {
-                    Decompress(input, output, headerEndianness);
+                    Decompress(input, output);
                     return output.ToArray();
                 }
             }
         }
 
-        public static void Decompress(byte[] sourceData, string destinationFilePath, Endianness headerEndianness)
+        public static void Decompress(byte[] sourceData, string destinationFilePath)
         {
-            ValidateEndianness(headerEndianness);
             using (MemoryStream input = new MemoryStream(sourceData))
             {
                 using (FileStream output = File.Create(destinationFilePath))
                 {
-                    Decompress(input, output, headerEndianness);
+                    Decompress(input, output);
                 }
             }
         }
 
-        public static void Decompress(string sourceFilePath, string destinationFilePath, Endianness headerEndianness)
+        public static void Decompress(string sourceFilePath, string destinationFilePath)
         {
-            ValidateEndianness(headerEndianness);
             using (FileStream input = File.OpenRead(sourceFilePath))
             {
                 using (FileStream output = File.Create(destinationFilePath))
                 {
-                    Decompress(input, output, headerEndianness);
+                    Decompress(input, output);
                 }
             }
         }
 
-        public static byte[] Decompress(byte[] sourceData, Endianness headerEndianness)
+        public static byte[] Decompress(byte[] sourceData)
         {
-            ValidateEndianness(headerEndianness);
             using (MemoryStream input = new MemoryStream(sourceData))
             {
                 using (MemoryStream output = new MemoryStream())
                 {
-                    Decompress(input, output, headerEndianness);
+                    Decompress(input, output);
                     return output.ToArray();
                 }
             }
         }
 
-        public static void Decompress(Stream input, Stream output, Endianness headerEndianness)
-        {
-            ValidateEndianness(headerEndianness);
-            if (input == null)
-            {
-                throw new ArgumentNullException("input");
-            }
-
-            if (output == null)
-            {
-                throw new ArgumentNullException("output");
-            }
-
-            KosinskiPlus.Decode(input, output, headerEndianness);
-        }
-
-        public static byte[] Compress(string sourceFilePath, Endianness headerEndianness)
-        {
-            ValidateEndianness(headerEndianness);
-            using (FileStream input = File.OpenRead(sourceFilePath))
-            {
-                using (MemoryStream output = new MemoryStream())
-                {
-                    Compress(input, output, headerEndianness);
-                    return output.ToArray();
-                }
-            }
-        }
-
-        public static void Compress(byte[] sourceData, string destinationFilePath, Endianness headerEndianness)
-        {
-            ValidateEndianness(headerEndianness);
-            using (MemoryStream input = new MemoryStream(sourceData))
-            {
-                using (FileStream output = File.Create(destinationFilePath))
-                {
-                    Compress(input, output, headerEndianness);
-                }
-            }
-        }
-
-        public static void Compress(string sourceFilePath, string destinationFilePath, Endianness headerEndianness)
-        {
-            ValidateEndianness(headerEndianness);
-            using (FileStream input = File.OpenRead(sourceFilePath))
-            {
-                using (FileStream output = File.Create(destinationFilePath))
-                {
-                    Compress(input, output, headerEndianness);
-                }
-            }
-        }
-
-        public static byte[] Compress(byte[] sourceData, Endianness headerEndianness)
-        {
-            ValidateEndianness(headerEndianness);
-            using (MemoryStream input = new MemoryStream(sourceData))
-            {
-                using (MemoryStream output = new MemoryStream())
-                {
-                    Compress(input, output, headerEndianness);
-                    return output.ToArray();
-                }
-            }
-        }
-
-        public static void Compress(Stream input, Stream output, Endianness headerEndianness)
+        public static void Decompress(Stream input, Stream output)
         {
             if (input == null)
             {
@@ -133,16 +63,68 @@
                 throw new ArgumentNullException("output");
             }
 
-            ValidateEndianness(headerEndianness);
-            KosinskiPlus.Encode(input, output, headerEndianness);
+            KosinskiPlus.Decode(input, output);
         }
 
-        private static void ValidateEndianness(Endianness endianness)
+        public static byte[] Compress(string sourceFilePath)
         {
-            if (endianness != Endianness.BigEndian && endianness != Endianness.LittleEndian)
+            using (FileStream input = File.OpenRead(sourceFilePath))
             {
-                throw new ArgumentOutOfRangeException("endianness");
+                using (MemoryStream output = new MemoryStream())
+                {
+                    Compress(input, output);
+                    return output.ToArray();
+                }
             }
+        }
+
+        public static void Compress(byte[] sourceData, string destinationFilePath)
+        {
+            using (MemoryStream input = new MemoryStream(sourceData))
+            {
+                using (FileStream output = File.Create(destinationFilePath))
+                {
+                    Compress(input, output);
+                }
+            }
+        }
+
+        public static void Compress(string sourceFilePath, string destinationFilePath)
+        {
+            using (FileStream input = File.OpenRead(sourceFilePath))
+            {
+                using (FileStream output = File.Create(destinationFilePath))
+                {
+                    Compress(input, output);
+                }
+            }
+        }
+
+        public static byte[] Compress(byte[] sourceData)
+        {
+            using (MemoryStream input = new MemoryStream(sourceData))
+            {
+                using (MemoryStream output = new MemoryStream())
+                {
+                    Compress(input, output);
+                    return output.ToArray();
+                }
+            }
+        }
+
+        public static void Compress(Stream input, Stream output)
+        {
+            if (input == null)
+            {
+                throw new ArgumentNullException("input");
+            }
+
+            if (output == null)
+            {
+                throw new ArgumentNullException("output");
+            }
+			
+            KosinskiPlus.EncodeModuled(input, output);
         }
     }
 }
