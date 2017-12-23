@@ -85,6 +85,22 @@
             }
         }
 
+        public static byte[] Decompress(byte[] sourceData, bool withSize)
+        {
+            using (MemoryStream input = new MemoryStream(sourceData))
+            {
+                using (MemoryStream output = new MemoryStream())
+                {
+                    if (withSize)
+                        Decompress(input, output);
+                    else
+                        Decompress(input, output, sourceData.Length);
+
+                    return output.ToArray();
+                }
+            }
+        }
+
         public static byte[] Decompress(byte[] sourceData, long size)
         {
             using (MemoryStream input = new MemoryStream(sourceData))

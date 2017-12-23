@@ -147,7 +147,7 @@ namespace SonicRetro.KensSharp.KensSharp
 							outdata = Nemesis.Decompress(indata);
                             break;
                         case CompressionType.Saxman:
-							outdata = Saxman.Decompress(indata);
+							outdata = Saxman.Decompress(indata, size);
                             break;
                         case CompressionType.ModuledKosinski:
                             outdata = ModuledKosinski.Decompress(indata, endian);
@@ -176,7 +176,7 @@ namespace SonicRetro.KensSharp.KensSharp
 							outdata = Nemesis.Compress(Nemesis.Decompress(indata));
                             break;
                         case CompressionType.Saxman:
-							outdata = Saxman.Compress(Saxman.Decompress(indata), size);
+							outdata = Saxman.Compress(Saxman.Decompress(indata, size), size);
                             break;
                         case CompressionType.ModuledKosinski:
                             outdata = ModuledKosinski.Compress(ModuledKosinski.Decompress(indata, endian), endian);
