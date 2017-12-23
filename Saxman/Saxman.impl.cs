@@ -139,7 +139,7 @@
                         break;
                     }
 
-                    ushort offset = NeutralEndian.Read1(input);
+                    int offset = NeutralEndian.Read1(input);
 
                     if (input.Position >= end)
                     {
@@ -152,6 +152,7 @@
                     // offset = %hhhhllllllll + 0x12, count = %cccc + 3
                     offset |= (ushort)((count & 0xF0) << 4);
                     offset += 0x12;
+                    offset &= 0xFFF;
                     offset |= (ushort)(outputBuffer.Count & 0xF000);
                     count &= 0xf;
                     count += 3;
@@ -162,13 +163,26 @@
                     }
 
                     outputBuffer.AddRange(new byte[count]);
-                    if (offset < outputBuffer.Count)
+
+                    if (offset < 0)
                     {
-                        for (int sourceIndex = offset, destinationIndex = outputBuffer.Count - count;
-                            destinationIndex < outputBuffer.Count;
-                            sourceIndex++, destinationIndex++)
+                        // Zero-fill
+                        for (int destinationIndex = outputBuffer.Count - count; destinationIndex < outputBuffer.Count; ++destinationIndex)
                         {
-                            outputBuffer[destinationIndex] = outputBuffer[sourceIndex];
+                            outputBuffer[destinationIndex] = 0;
+                        }
+                    }
+                    else
+                    {
+                        // Dictionary reference
+                        if (offset < outputBuffer.Count)
+                        {
+                            for (int sourceIndex = offset, destinationIndex = outputBuffer.Count - count;
+                                destinationIndex < outputBuffer.Count;
+                                sourceIndex++, destinationIndex++)
+                            {
+                                outputBuffer[destinationIndex] = outputBuffer[sourceIndex];
+                            }
                         }
                     }
                 }
