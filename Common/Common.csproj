@@ -53,6 +53,8 @@
     <Compile Include="UInt16LE_E_L_OutputBitStream.cs" />
     <Compile Include="InputBitStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UInt8_NE_L_OutputBitStream.cs" />
+    <Compile Include="UInt8_NE_L_InputBitStream.cs" />
     <Compile Include="UInt8_NE_H_InputBitStream.cs" />
     <Compile Include="UInt8_E_L_InputBitStream.cs" />
     <Compile Include="UInt8_NE_H_OutputBitStream.cs" />

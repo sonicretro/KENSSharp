@@ -19,7 +19,7 @@
             }
 
             List<byte> data = new List<byte>();
-            UInt8_E_L_OutputBitStream bitStream = new UInt8_E_L_OutputBitStream(output);
+            UInt8_NE_L_OutputBitStream bitStream = new UInt8_NE_L_OutputBitStream(output);
 
             long input_pointer = 0;
             while (input_pointer < input_size)
@@ -68,13 +68,13 @@
                 if (longest_match_length < 3)
                 {
                     // Uncompressed
-                    data.Add(input_buffer[input_pointer]);
                     if (bitStream.Push(true))
                     {
                         byte[] dataArray = data.ToArray();
                         output.Write(dataArray, 0, dataArray.Length);
                         data.Clear();
                     }
+                    data.Add(input_buffer[input_pointer]);
 
                     longest_match_length = 1;
                 }
@@ -82,14 +82,14 @@
                 {
                     // Compressed
                     long match_offset_adjusted = longest_match_offset - 0x12;	// I don't think there's any reason for this, the format's just stupid
-                    data.Add((byte)(match_offset_adjusted & 0xFF));
-                    data.Add((byte)(((match_offset_adjusted & 0xF00) >> 4) | ((longest_match_length - 3) & 0x0F)));
                     if (bitStream.Push(false))
                     {
                         byte[] dataArray = data.ToArray();
                         output.Write(dataArray, 0, dataArray.Length);
                         data.Clear();
                     }
+                    data.Add((byte)(match_offset_adjusted & 0xFF));
+                    data.Add((byte)(((match_offset_adjusted & 0xF00) >> 4) | ((longest_match_length - 3) & 0x0F)));
                 }
 
                 input_pointer += longest_match_length;
@@ -119,11 +119,11 @@
         private static void Decode(Stream input, Stream output, long size)
         {
             long end = input.Position + size;
-            UInt8_E_L_InputBitStream bitStream = new UInt8_E_L_InputBitStream(input);
+            UInt8_NE_L_InputBitStream bitStream = new UInt8_NE_L_InputBitStream(input);
             List<byte> outputBuffer = new List<byte>();
             while (input.Position < end)
             {
-                if (bitStream.Unshift())
+                if (bitStream.Pop())
                 {
                     if (input.Position >= end)
                     {
