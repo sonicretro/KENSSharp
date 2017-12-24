@@ -64,7 +64,6 @@
                 }
 
                 // We cannot compress runs shorter than three bytes
-                // (and even if we could, it would take more space than storing uncompressed)
                 if (longest_match_length < 3)
                 {
                     // Uncompressed
@@ -152,7 +151,7 @@
                     offset += 0x12;
                     offset &= 0xFFF;
                     offset |= (ushort)(outputBuffer.Count & 0xF000);
-                    count &= 0xf;
+                    count &= 0xF;
                     count += 3;
 
                     if (offset >= outputBuffer.Count)
