@@ -58,7 +58,7 @@
 
         private static void EncodeInternal(Stream destination, byte[] buffer, long pos, long slidingWindow, long recLength, long size)
         {
-            UInt8NonEarlyBEOutputBitStream bitStream = new UInt8NonEarlyBEOutputBitStream(destination);
+            UInt8_NE_H_OutputBitStream bitStream = new UInt8_NE_H_OutputBitStream(destination);
             MemoryStream data = new MemoryStream();
 
             if (size > 0)
@@ -149,7 +149,7 @@
             destination.Write(bytes, 0, bytes.Length);
         }
 
-        private static void Push(UInt8NonEarlyBEOutputBitStream bitStream, bool bit, Stream destination, MemoryStream data)
+        private static void Push(UInt8_NE_H_OutputBitStream bitStream, bool bit, Stream destination, MemoryStream data)
         {
             if (bitStream.Push(bit))
             {
@@ -190,7 +190,7 @@
 
         private static void DecodeInternal(Stream source, Stream destination, ref long decompressedBytes)
         {
-            UInt8NonEarlyBEInputBitStream bitStream = new UInt8NonEarlyBEInputBitStream(source);
+            UInt8_NE_H_InputBitStream bitStream = new UInt8_NE_H_InputBitStream(source);
 
             for (; ; )
             {

@@ -19,7 +19,7 @@
             }
 
             List<byte> data = new List<byte>();
-            UInt8OutputBitStream bitStream = new UInt8OutputBitStream(output);
+            UInt8_E_L_OutputBitStream bitStream = new UInt8_E_L_OutputBitStream(output);
 
             long input_pointer = 0;
             while (input_pointer < input_size)
@@ -119,7 +119,7 @@
         private static void Decode(Stream input, Stream output, long size)
         {
             long end = input.Position + size;
-            UInt8InputBitStream bitStream = new UInt8InputBitStream(input);
+            UInt8_E_L_InputBitStream bitStream = new UInt8_E_L_InputBitStream(input);
             List<byte> outputBuffer = new List<byte>();
             while (input.Position < end)
             {

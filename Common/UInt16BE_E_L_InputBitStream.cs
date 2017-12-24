@@ -1,4 +1,4 @@
-﻿// 16-bit little-endian input bitstream
+﻿// 16-bit big-endian input bitstream
 // Data is fetched early (right after the last bit is popped, rather than before a new bit is needed)
 // Bits are popped lowest-first
 
@@ -7,13 +7,13 @@ namespace SonicRetro.KensSharp
     using System;
     using System.IO;
 
-    public sealed class UInt16LEInputBitStream : InputBitStream<ushort>
+    public sealed class UInt16BE_E_L_InputBitStream : InputBitStream<ushort>
     {
         private Stream stream;
         private int remainingBits;
         private ushort byteBuffer;
 
-        public UInt16LEInputBitStream(Stream stream)
+        public UInt16BE_E_L_InputBitStream(Stream stream)
         {
             if (stream == null)
             {
@@ -23,7 +23,7 @@ namespace SonicRetro.KensSharp
             this.stream = stream;
 
             this.remainingBits = 16;
-            this.byteBuffer = LittleEndian.Read2(stream);
+            this.byteBuffer = BigEndian.Read2(stream);
         }
 
         public override bool Get()
@@ -38,7 +38,9 @@ namespace SonicRetro.KensSharp
         public override bool Pop()
         {
             --this.remainingBits;
-            ushort bit = (ushort)(this.byteBuffer & 1);
+            ushort bit;
+            
+            bit = (ushort)(this.byteBuffer & 1);
             this.byteBuffer >>= 1;
 
             this.CheckBuffer();
@@ -53,7 +55,7 @@ namespace SonicRetro.KensSharp
             {
                 int delta = count - this.remainingBits;
                 ushort lowBits = (ushort)(this.byteBuffer << delta);
-                this.byteBuffer = LittleEndian.Read2(stream);
+                this.byteBuffer = BigEndian.Read2(stream);
                 this.remainingBits = 16 - delta;
                 ushort highBits = (ushort)(this.byteBuffer >> this.remainingBits);
                 this.byteBuffer ^= (ushort)(highBits << this.remainingBits);
@@ -70,7 +72,7 @@ namespace SonicRetro.KensSharp
         {
             if (this.remainingBits == 0)
             {
-                this.byteBuffer = LittleEndian.Read2(stream);
+                this.byteBuffer = BigEndian.Read2(stream);
                 this.remainingBits = 16;
             }
         }

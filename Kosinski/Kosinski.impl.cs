@@ -72,7 +72,7 @@
 
         private static void EncodeInternal(Stream destination, byte[] buffer, long pos, long slidingWindow, long recLength, long size)
         {
-            UInt16LEOutputBitStream bitStream = new UInt16LEOutputBitStream(destination);
+            UInt16LE_E_L_OutputBitStream bitStream = new UInt16LE_E_L_OutputBitStream(destination);
             MemoryStream data = new MemoryStream();
 
             if (size > 0)
@@ -171,7 +171,7 @@
             destination.Write(bytes, 0, bytes.Length);
         }
 
-        private static void Push(UInt16LEOutputBitStream bitStream, bool bit, Stream destination, MemoryStream data)
+        private static void Push(UInt16LE_E_L_OutputBitStream bitStream, bool bit, Stream destination, MemoryStream data)
         {
             if (bitStream.Push(bit))
             {
@@ -225,7 +225,7 @@
 
         private static void DecodeInternal(Stream source, Stream destination, ref long decompressedBytes)
         {
-            UInt16LEInputBitStream bitStream = new UInt16LEInputBitStream(source);
+            UInt16LE_E_L_InputBitStream bitStream = new UInt16LE_E_L_InputBitStream(source);
 
             for (;;)
             {

@@ -7,13 +7,13 @@ namespace SonicRetro.KensSharp
     using System;
     using System.IO;
 
-    public sealed class UInt8NonEarlyBEOutputBitStream : OutputBitStream<byte>
+    public sealed class UInt8_NE_H_OutputBitStream : OutputBitStream<byte>
     {
         private Stream stream;
         private int waitingBits;
         private byte byteBuffer;
 
-        public UInt8NonEarlyBEOutputBitStream(Stream stream)
+        public UInt8_NE_H_OutputBitStream(Stream stream)
         {
             if (stream == null)
             {

@@ -569,7 +569,7 @@
             NeutralEndian.Write1(output, 0xff);
 
             // Write the encoded bitstream.
-            UInt8OutputBitStream bitStream = new UInt8OutputBitStream(output);
+            UInt8_E_L_OutputBitStream bitStream = new UInt8_E_L_OutputBitStream(output);
 
             // The RLE-encoded source makes for a far faster encode as we simply
             // use the nibble runs as an index into the map, meaning a quick binary
@@ -648,19 +648,19 @@
 
         private static void DecodeInternal(Stream input, Stream output, DecodingCodeTreeNode codeTree, ushort numberOfTiles, bool xorOutput)
         {
-            UInt8InputBitStream inputBits = new UInt8InputBitStream(input);
-            UInt8OutputBitStream outputBits;
+            UInt8_E_L_InputBitStream inputBits = new UInt8_E_L_InputBitStream(input);
+            UInt8_E_L_OutputBitStream outputBits;
             XorStream xorStream = null;
             try
             {
                 if (xorOutput)
                 {
                     xorStream = new XorStream(output);
-                    outputBits = new UInt8OutputBitStream(xorStream);
+                    outputBits = new UInt8_E_L_OutputBitStream(xorStream);
                 }
                 else
                 {
-                    outputBits = new UInt8OutputBitStream(output);
+                    outputBits = new UInt8_E_L_OutputBitStream(output);
                 }
 
                 // The output is: number of tiles * 0x20 (1 << 5) bytes per tile * 8 (1 << 3) bits per byte
@@ -708,7 +708,7 @@
             }
         }
 
-        private static void DecodeNibbleRun(UInt8InputBitStream inputBits, UInt8OutputBitStream outputBits, byte count, byte nibble, ref int bitsWritten)
+        private static void DecodeNibbleRun(UInt8_E_L_InputBitStream inputBits, UInt8_E_L_OutputBitStream outputBits, byte count, byte nibble, ref int bitsWritten)
         {
             bitsWritten += count * 4;
 

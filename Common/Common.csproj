@@ -35,10 +35,10 @@
     <Compile Include="BigEndian.cs" />
     <Compile Include="CompressionException.cs" />
     <Compile Include="Endianness.cs" />
-    <Compile Include="UInt16BENonEarlyBEInputBitStream.cs" />
-    <Compile Include="UInt16BEInputBitStream.cs" />
-    <Compile Include="UInt16BENonEarlyBEOutputBitStream.cs" />
-    <Compile Include="UInt16BEOutputBitStream.cs" />
+    <Compile Include="UInt16BE_NE_H_InputBitStream.cs" />
+    <Compile Include="UInt16BE_E_L_InputBitStream.cs" />
+    <Compile Include="UInt16BE_NE_H_OutputBitStream.cs" />
+    <Compile Include="UInt16BE_E_L_OutputBitStream.cs" />
     <Compile Include="LittleEndian.cs" />
     <Compile Include="NeutralEndian.cs" />
     <Compile Include="OutputBitStream.cs" />
@@ -49,14 +49,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="UInt16LEInputBitStream.cs" />
-    <Compile Include="UInt16LEOutputBitStream.cs" />
+    <Compile Include="UInt16LE_E_L_InputBitStream.cs" />
+    <Compile Include="UInt16LE_E_L_OutputBitStream.cs" />
     <Compile Include="InputBitStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UInt8NonEarlyBEInputBitStream.cs" />
-    <Compile Include="UInt8InputBitStream.cs" />
-    <Compile Include="UInt8NonEarlyBEOutputBitStream.cs" />
-    <Compile Include="UInt8OutputBitStream.cs" />
+    <Compile Include="UInt8_NE_H_InputBitStream.cs" />
+    <Compile Include="UInt8_E_L_InputBitStream.cs" />
+    <Compile Include="UInt8_NE_H_OutputBitStream.cs" />
+    <Compile Include="UInt8_E_L_OutputBitStream.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

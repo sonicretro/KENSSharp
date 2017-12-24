@@ -27,12 +27,12 @@
             if (endianness == Endianness.BigEndian)
             {
                 write2 = Write2BE;
-                bitStream = new UInt16BEOutputBitStream(output);
+                bitStream = new UInt16BE_E_L_OutputBitStream(output);
             }
             else
             {
                 write2 = Write2LE;
-                bitStream = new UInt16LEOutputBitStream(output);
+                bitStream = new UInt16LE_E_L_OutputBitStream(output);
             }
 
             // To unpack source into 2-byte words.
@@ -222,14 +222,14 @@
                 {
                     incrementingValue = BigEndian.Read2(paddedInput);
                     commonValue = BigEndian.Read2(paddedInput);
-                    bitStream = new UInt16BEInputBitStream(paddedInput);
+                    bitStream = new UInt16BE_E_L_InputBitStream(paddedInput);
                     write2 = Write2BE;
                 }
                 else
                 {
                     incrementingValue = LittleEndian.Read2(paddedInput);
                     commonValue = LittleEndian.Read2(paddedInput);
-                    bitStream = new UInt16LEInputBitStream(paddedInput);
+                    bitStream = new UInt16LE_E_L_InputBitStream(paddedInput);
                     write2 = Write2LE;
                 }
 
