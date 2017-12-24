@@ -68,12 +68,7 @@
                 if (longest_match_length < 3)
                 {
                     // Uncompressed
-                    if (bitStream.Push(true))
-                    {
-                        byte[] dataArray = data.ToArray();
-                        output.Write(dataArray, 0, dataArray.Length);
-                        data.Clear();
-                    }
+                    Push(bitStream, true, output, data);
                     data.Add(input_buffer[input_pointer]);
 
                     longest_match_length = 1;
@@ -81,32 +76,35 @@
                 else
                 {
                     // Compressed
-                    long match_offset_adjusted = longest_match_offset - 0x12;	// I don't think there's any reason for this, the format's just stupid
-                    if (bitStream.Push(false))
-                    {
-                        byte[] dataArray = data.ToArray();
-                        output.Write(dataArray, 0, dataArray.Length);
-                        data.Clear();
-                    }
+                    Push(bitStream, false, output, data);
+                    long match_offset_adjusted = longest_match_offset - 0x12;   // I don't think there's any reason for this, the format's just stupid
                     data.Add((byte)(match_offset_adjusted & 0xFF));
                     data.Add((byte)(((match_offset_adjusted & 0xF00) >> 4) | ((longest_match_length - 3) & 0x0F)));
                 }
 
                 input_pointer += longest_match_length;
             }
-
-            {
-                bitStream.Flush(true);
-                byte[] dataArray = data.ToArray();
-                output.Write(dataArray, 0, dataArray.Length);
-                data.Clear();
-            }
+            
+            // Write remaining data (normally we don't flush until we have a full descriptor byte)
+            bitStream.Flush(true);
+            byte[] dataArray = data.ToArray();
+            output.Write(dataArray, 0, dataArray.Length);
 
             if (with_size)
             {
                 ushort size = (ushort)(output.Position - 2);
                 output.Seek(outputInitialPosition, SeekOrigin.Begin);
                 LittleEndian.Write2(output, size);
+            }
+        }
+
+        private static void Push(UInt8_NE_L_OutputBitStream bitStream, bool bit, Stream destination, List<byte> data)
+        {
+            if (bitStream.Push(bit))
+            {
+                byte[] bytes = data.ToArray();
+                destination.Write(bytes, 0, bytes.Length);
+                data.Clear();
             }
         }
 
