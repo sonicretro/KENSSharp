@@ -45,15 +45,6 @@ namespace SonicRetro.KensSharp
             return bit != 0;
         }
 
-        public bool Unshift()
-        {
-            this.CheckBuffer();
-            --this.remainingBits;
-            byte bit = (byte)(this.byteBuffer & 0x80);
-            this.byteBuffer <<= 1;
-            return bit != 0;
-        }
-
         public override byte Read(int count)
         {
             this.CheckBuffer();
