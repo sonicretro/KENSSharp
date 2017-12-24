@@ -1,4 +1,8 @@
-﻿namespace SonicRetro.KensSharp
+﻿// 8-bit output bitstream
+// Data is not stored early (right before a new bit is pushed, rather than after the last bit is pushed)
+// Bits are pushed highest-first
+
+namespace SonicRetro.KensSharp
 {
     using System;
     using System.IO;

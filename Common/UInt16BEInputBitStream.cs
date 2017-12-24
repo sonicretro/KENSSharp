@@ -1,4 +1,8 @@
-﻿namespace SonicRetro.KensSharp
+﻿// 16-bit big-endian input bitstream
+// Data is fetched early (right after the last bit is popped, rather than before a new bit is needed)
+// Bits are popped lowest-first
+
+namespace SonicRetro.KensSharp
 {
     using System;
     using System.IO;
