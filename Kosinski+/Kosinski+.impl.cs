@@ -165,18 +165,10 @@
             DecodeInternal(source, destination, ref decompressedBytes);
         }
 
-        internal static void Decode(Stream source, Stream destination, Endianness headerEndianness)
+        internal static void DecodeModuled(Stream source, Stream destination)
         {
             long decompressedBytes = 0;
-            long fullSize;
-            if (headerEndianness == Endianness.BigEndian)
-            {
-                fullSize = BigEndian.Read2(source);
-            }
-            else
-            {
-                fullSize = LittleEndian.Read2(source);
-            }
+			long fullSize = BigEndian.Read2(source);
 
             for (; ; )
             {

@@ -63,7 +63,7 @@
                 throw new ArgumentNullException("output");
             }
 
-            KosinskiPlus.Decode(input, output);
+            KosinskiPlus.DecodeModuled(input, output);
         }
 
         public static byte[] Compress(string sourceFilePath)
