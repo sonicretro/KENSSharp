@@ -6,16 +6,16 @@
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{C6E49E8A-37DE-4CC1-8BD2-74EC835513DA}
-AppName=KensSharp
+AppName=KENSSharp
 AppVersion=1.2
-;AppVerName=KensSharp 1.0
+;AppVerName=KENSSharp 1.0
 AppPublisher=Sonic Retro
 AppPublisherURL=http://sonicretro.org/
 AppSupportURL=http://sonicretro.org/
 AppUpdatesURL=http://sonicretro.org/
 DefaultDirName={pf}\KensSharp
 AllowNoIcons=yes
-OutputBaseFilename=KensSharpSetup
+OutputBaseFilename=KENSSharpSetup
 Compression=lzma
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
@@ -64,5 +64,5 @@ Name: starticon; Description: "Create a &start menu icon"
 Name: desktopicon; Description: "Create a &desktop icon"
 
 [Icons]
-Name: "{userprograms}\KensSharp Frontend"; Filename: "{app}\KensSharpFrontend.exe"; Tasks: starticon
-Name: "{userdesktop}\KensSharp Frontend"; Filename: "{app}\KensSharpFrontend.exe"; Tasks: desktopicon
+Name: "{userprograms}\KENSSharp Frontend"; Filename: "{app}\KensSharpFrontend.exe"; Tasks: starticon
+Name: "{userdesktop}\KENSSharp Frontend"; Filename: "{app}\KensSharpFrontend.exe"; Tasks: desktopicon

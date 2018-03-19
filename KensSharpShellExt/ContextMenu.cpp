@@ -195,7 +195,7 @@ IFACEMETHODIMP CContextMenu::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT 
 	MENUITEMINFO mii = { sizeof(mii) };
 	mii.fMask = MIIM_STRING | MIIM_ID | MIIM_SUBMENU;
 	mii.wID = idCmdFirst + curid;
-	mii.dwTypeData = L"KensSharp";
+	mii.dwTypeData = L"KENSSharp";
 	mii.hSubMenu = ProcessSubMenu(rootmenu, idCmdFirst);
 	if (!InsertMenuItem(hMenu, indexMenu, TRUE, &mii))
 	{
