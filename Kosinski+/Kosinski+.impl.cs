@@ -109,9 +109,9 @@
                     {
                         Push(bitStream, false, destination, data);
                         Push(bitStream, false, destination, data);
+                        NeutralEndian.Write1(data, (byte)(~(bPointer - iOffset - 1)));
                         Push(bitStream, (((iCount - 2) >> 1) & 1) != 0, destination, data);
                         Push(bitStream, ((iCount - 2) & 1) != 0, destination, data);
-                        NeutralEndian.Write1(data, (byte)(~(bPointer - iOffset - 1)));
                     }
                     else
                     {
@@ -123,12 +123,12 @@
 
                         if (iCount < 10) // iCount - 2 < 8
                         {
-                            info |= (ushort)(iCount - 2);
-                            BigEndian.Write2(data, info);
+                            info |= (ushort)(10 - iCount);
+                            LittleEndian.Write2(data, info);
                         }
                         else
                         {
-                            BigEndian.Write2(data, info);
+                            LittleEndian.Write2(data, info);
                             NeutralEndian.Write1(data, (byte)(iCount - 9));
                         }
                     }
@@ -140,8 +140,8 @@
             Push(bitStream, false, destination, data);
             Push(bitStream, true, destination, data);
 
-            NeutralEndian.Write1(data, 0);
             NeutralEndian.Write1(data, 0xF0);
+            NeutralEndian.Write1(data, 0);
             NeutralEndian.Write1(data, 0);
             bitStream.Flush(true);
 
@@ -198,8 +198,8 @@
 
                     if (bitStream.Pop())
                     {
-                        byte low = NeutralEndian.Read1(source);
                         byte high = NeutralEndian.Read1(source);
+                        byte low = NeutralEndian.Read1(source);
                         count = high & 0x07;
                         if (count == 0)
                         {
@@ -209,25 +209,25 @@
                                 break;
                             }
 
-                            count += 8;
+                            count += 9;
                         }
                         else
                         {
-                            ++count;
+                            count = 10 - count;
                         }
 
                         offset = ~0x1FFFL | ((0xF8 & high) << 5) | low;
                     }
                     else
                     {
-                        byte low = Convert.ToByte(bitStream.Pop());
-                        byte high = Convert.ToByte(bitStream.Pop());
-                        count = (low << 1 | high) + 1;
                         offset = NeutralEndian.Read1(source);
                         offset |= ~0xFFL;
+                        byte low = Convert.ToByte(bitStream.Pop());
+                        byte high = Convert.ToByte(bitStream.Pop());
+                        count = (low << 1 | high) + 2;
                     }
 
-                    for (long i = 0; i <= count; i++)
+                    for (long i = 0; i < count; i++)
                     {
                         long writePosition = destination.Position;
                         destination.Seek(writePosition + offset, SeekOrigin.Begin);
@@ -236,7 +236,7 @@
                         NeutralEndian.Write1(destination, b);
                     }
 
-                    decompressedBytes += count + 1;
+                    decompressedBytes += count;
                 }
             }
         }
