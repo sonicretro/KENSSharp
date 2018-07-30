@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Enigma", "Enigma\Enigma.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saxman", "Saxman\Saxman.csproj", "{2BB00C68-FAAB-443D-95D4-EEBEB26AE69C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KensSharp", "KensSharp\KensSharp.csproj", "{35828BBE-E98B-43F2-9136-846ED6C2BF4D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KENSSharp", "KensSharp\KENSSharp.csproj", "{35828BBE-E98B-43F2-9136-846ED6C2BF4D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{AC492ED3-4907-475B-93EA-C3F96EAB0FB4}"
 	ProjectSection(SolutionItems) = preProject
