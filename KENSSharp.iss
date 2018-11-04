@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{C6E49E8A-37DE-4CC1-8BD2-74EC835513DA}
 AppName=KENSSharp
-AppVersion=1.2
+AppVersion=1.3
 ;AppVerName=KENSSharp 1.0
 AppPublisher=Sonic Retro
 AppPublisherURL=http://sonicretro.org/
