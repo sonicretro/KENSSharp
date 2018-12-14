@@ -2,12 +2,33 @@
 {
     using System;
     using System.IO;
-    using System.Security;
 
     public static partial class KosinskiPlus
     {
-        private const long SlidingWindow = 8192;
-        private const long RecurrenceLength = 256 + 8;
+        private struct LZSSNodeMeta
+        {
+            public long cost;
+            public long next_node_index;
+            public long previous_node_index;
+            public long match_length;
+            public long match_offset;
+        };
+
+        private const long max_match_length = 0x100 + 8;
+        private const long max_match_distance = 0x2000;
+        private const long literal_cost = 1 + 8;
+
+        private static long GetMatchCost(long distance, long length)
+        {
+            if (length >= 2 && length <= 5 && distance <= 256)
+                return 2 + 2 + 8;   // Descriptor bits, length bits, offset byte
+            else if (length >= 3 && length <= 9)
+                return 2 + 16;      // Descriptor bits, offset/length bytes
+            else if (length >= 10)
+                return 2 + 16 + 8;  // Descriptor bits, offset bytes, length byte
+            else
+                return 0; 		// In the event a match cannot be compressed
+        }
 
         internal static void Encode(Stream source, Stream destination)
         {
@@ -15,7 +36,7 @@
             byte[] buffer = new byte[size];
             source.Read(buffer, 0, (int)size);
 
-            EncodeInternal(destination, buffer, 0, SlidingWindow, RecurrenceLength, size);
+            EncodeInternal(destination, buffer, 0, size);
         }
 
         internal static void EncodeModuled(Stream source, Stream destination)
@@ -42,7 +63,7 @@
 
             for (; ; )
             {
-                EncodeInternal(destination, buffer, pos, SlidingWindow, RecurrenceLength, remainingSize);
+                EncodeInternal(destination, buffer, pos, remainingSize);
 
                 compBytes += remainingSize;
                 pos += remainingSize;
@@ -56,84 +77,93 @@
             }
         }
 
-        private static void EncodeInternal(Stream destination, byte[] buffer, long pos, long slidingWindow, long recLength, long size)
+        private static void EncodeInternal(Stream destination, byte[] buffer, long pos, long size)
         {
             UInt8_NE_H_OutputBitStream bitStream = new UInt8_NE_H_OutputBitStream(destination);
             MemoryStream data = new MemoryStream();
 
-            if (size > 0)
+            LZSSNodeMeta[] node_meta_array = new LZSSNodeMeta[size + 1];
+
+            node_meta_array[0].cost = 0;
+            for (long i = 1; i < size + 1; ++i)
+                node_meta_array[i].cost = long.MaxValue;
+
+            for (long i = 0; i < size; ++i)
             {
-                long bPointer = 1, iOffset = 0;
-                bitStream.Push(true);
-                NeutralEndian.Write1(data, buffer[pos]);
+                long max_read_ahead = Math.Min(max_match_length, size - i);
+                long max_read_behind = max_match_distance > i ? 0 : i - max_match_distance;
 
-                while (bPointer < size)
+                for (long j = i; j-- > max_read_behind;)
                 {
-                    long iCount = Math.Min(recLength, size - bPointer);
-                    long iMax = Math.Max(bPointer - slidingWindow, 0);
-                    long k = 1;
-                    long i = bPointer - 1;
-
-                    do
+                    for (long k = 0; k < max_read_ahead; ++k)
                     {
-                        long j = 0;
-                        while (buffer[pos + i + j] == buffer[pos + bPointer + j])
+                        if (buffer[pos + i + k] == buffer[pos + j + k])
                         {
-                            if (++j >= iCount)
+                            long cost = GetMatchCost(i - j, k + 1);
+
+                            if (cost != 0 && node_meta_array[i + k + 1].cost > node_meta_array[i].cost + cost)
                             {
-                                break;
+                                node_meta_array[i + k + 1].cost = node_meta_array[i].cost + cost;
+                                node_meta_array[i + k + 1].previous_node_index = i;
+                                node_meta_array[i + k + 1].match_length = k + 1;
+                                node_meta_array[i + k + 1].match_offset = j;
                             }
                         }
-
-                        if (j > k)
-                        {
-                            k = j;
-                            iOffset = i;
-                        }
-                    } while (i-- > iMax);
-
-                    iCount = k;
-
-                    if (iCount == 1)
-                    {
-                        Push(bitStream, true, destination, data);
-                        NeutralEndian.Write1(data, buffer[pos + bPointer]);
-                    }
-                    else if (iCount == 2 && bPointer - iOffset > 256)
-                    {
-                        Push(bitStream, true, destination, data);
-                        NeutralEndian.Write1(data, buffer[pos + bPointer]);
-                        --iCount;
-                    }
-                    else if (iCount < 6 && bPointer - iOffset <= 256)
-                    {
-                        Push(bitStream, false, destination, data);
-                        Push(bitStream, false, destination, data);
-                        NeutralEndian.Write1(data, (byte)(~(bPointer - iOffset - 1)));
-                        Push(bitStream, (((iCount - 2) >> 1) & 1) != 0, destination, data);
-                        Push(bitStream, ((iCount - 2) & 1) != 0, destination, data);
-                    }
-                    else
-                    {
-                        Push(bitStream, false, destination, data);
-                        Push(bitStream, true, destination, data);
-
-                        long off = bPointer - iOffset - 1;
-                        ushort info = (ushort)(~((off << 8) | (off >> 5)) & 0xFFF8);
-
-                        if (iCount < 10) // iCount - 2 < 8
-                        {
-                            info |= (ushort)(10 - iCount);
-                            LittleEndian.Write2(data, info);
-                        }
                         else
-                        {
-                            LittleEndian.Write2(data, info);
-                            NeutralEndian.Write1(data, (byte)(iCount - 9));
-                        }
+                            break;
                     }
+                }
 
-                    bPointer += iCount;
+                if (node_meta_array[i + 1].cost >= node_meta_array[i].cost + literal_cost)
+                {
+                    node_meta_array[i + 1].cost = node_meta_array[i].cost + literal_cost;
+                    node_meta_array[i + 1].previous_node_index = i;
+                    node_meta_array[i + 1].match_length = 0;
+                }
+            }
+
+            node_meta_array[0].previous_node_index = long.MaxValue;
+            node_meta_array[size].next_node_index = long.MaxValue;
+            for (long node_index = size; node_meta_array[node_index].previous_node_index != long.MaxValue; node_index = node_meta_array[node_index].previous_node_index)
+                node_meta_array[node_meta_array[node_index].previous_node_index].next_node_index = node_index;
+
+            for (long node_index = 0; node_meta_array[node_index].next_node_index != long.MaxValue; node_index = node_meta_array[node_index].next_node_index)
+            {
+                long next_index = node_meta_array[node_index].next_node_index;
+
+                long length = node_meta_array[next_index].match_length;
+                long distance = next_index - node_meta_array[next_index].match_length - node_meta_array[next_index].match_offset;
+
+                if (node_meta_array[next_index].match_length != 0)
+                {
+                    if (length >= 2 && length <= 5 && distance <= 256)
+                    {
+                        Push(bitStream, false, destination, data);
+                        Push(bitStream, false, destination, data);
+                        NeutralEndian.Write1(data, (byte)-distance);
+                        Push(bitStream, ((length - 2) & 2) != 0, destination, data);
+                        Push(bitStream, ((length - 2) & 1) != 0, destination, data);
+                    }
+                    else if (length >= 3 && length <= 9)
+                    {
+                        Push(bitStream, false, destination, data);
+                        Push(bitStream, true, destination, data);
+                        NeutralEndian.Write1(data, (byte)(((-distance >> (8 - 3)) & 0xF8) | ((10 - length) & 7)));
+                        NeutralEndian.Write1(data, (byte)(-distance & 0xFF));
+                    }
+                    else //if (length >= 3)
+                    {
+                        Push(bitStream, false, destination, data);
+                        Push(bitStream, true, destination, data);
+                        NeutralEndian.Write1(data, (byte)((-distance >> (8 - 3)) & 0xF8));
+                        NeutralEndian.Write1(data, (byte)(-distance & 0xFF));
+                        NeutralEndian.Write1(data, (byte)(length - 9));
+                    }
+                }
+                else
+                {
+                    Push(bitStream, true, destination, data);
+                    NeutralEndian.Write1(data, buffer[pos + node_index]);
                 }
             }
 
