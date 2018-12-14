@@ -13,7 +13,10 @@
             public long match_offset;
         };
 
-        public static NodeMeta[] FindMatches(byte[] data, long data_size, long max_match_length, long max_match_distance, Action<byte[], long, long, NodeMeta[]> find_extra_matches, long literal_cost, Func<long, long, long> match_cost_callback)
+        // What the fuck is wrong with this language? Why is four params okay, but when I need five I have to do this?
+        public delegate void Action<T1, T2, T3, T4, T5>(T1 p1, T2 p2, T3 p3, T4 p4, T5 p5);
+
+        public static NodeMeta[] FindMatches<T>(T[] data, long pos, long data_size, long max_match_length, long max_match_distance, Action<T[], long, long, long, NodeMeta[]> find_extra_matches, long literal_cost, Func<long, long, long> match_cost_callback)
         {
             NodeMeta[] node_meta_array = new NodeMeta[data_size + 1];
 
@@ -26,13 +29,13 @@
                 long max_read_ahead = Math.Min(max_match_length, data_size - i);
                 long max_read_behind = max_match_distance > i ? 0 : i - max_match_distance;
 
-                find_extra_matches(data, data_size, i, node_meta_array);
+                find_extra_matches(data, pos, data_size, i, node_meta_array);
 
                 for (long j = i; j-- > max_read_behind;)
                 {
                     for (long k = 0; k < max_read_ahead; ++k)
                     {
-                        if (data[i + k] == data[j + k])
+                        if (data[pos + i + k].Equals(data[pos + j + k]))
                         {
                             long cost = match_cost_callback(i - j, k + 1);
 

@@ -5,7 +5,7 @@
 
     public static partial class KosinskiPlus
     {
-        private static void FindExtraMatches(byte[] data, long data_size, long offset, LZSS.NodeMeta[] node_meta_array)
+        private static void FindExtraMatches(byte[] data, long pos, long data_size, long offset, LZSS.NodeMeta[] node_meta_array)
         {
             // Kosinski+ has no special matches
         }
@@ -71,7 +71,7 @@
 
         private static void EncodeInternal(Stream destination, byte[] buffer, long pos, long size)
         {
-            LZSS.NodeMeta[] node_meta_array = LZSS.FindMatches(buffer, size, 0x100 + 8, 0x2000, FindExtraMatches, 1 + 8, GetMatchCost);
+            LZSS.NodeMeta[] node_meta_array = LZSS.FindMatches(buffer, pos, size, 0x100 + 8, 0x2000, FindExtraMatches, 1 + 8, GetMatchCost);
 
             UInt8_NE_H_OutputBitStream bitStream = new UInt8_NE_H_OutputBitStream(destination);
             MemoryStream data = new MemoryStream();

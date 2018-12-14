@@ -5,14 +5,14 @@
 
     public static partial class Saxman
     {
-        private static void FindExtraMatches(byte[] data, long data_size, long offset, LZSS.NodeMeta[] node_meta_array)
+        private static void FindExtraMatches(byte[] data, long pos, long data_size, long offset, LZSS.NodeMeta[] node_meta_array)
         {
             // Find zero-fill matches
             if (offset < 0x1000)
             {
                 for (long k = 0; k < 0xF + 3; ++k)
                 {
-                    if (data[offset + k] == 0)
+                    if (data[pos + offset + k] == 0)
                     {
                         long cost = GetMatchCost(0, k + 1);
 
@@ -50,7 +50,7 @@
                 output.Seek(2, SeekOrigin.Current);
             }
 
-            LZSS.NodeMeta[] node_meta_array = LZSS.FindMatches(input_buffer, input_size, 0xF + 3, 0x1000, FindExtraMatches, 1 + 8, GetMatchCost);
+            LZSS.NodeMeta[] node_meta_array = LZSS.FindMatches(input_buffer, 0, input_size, 0xF + 3, 0x1000, FindExtraMatches, 1 + 8, GetMatchCost);
 
             UInt8_NE_L_OutputBitStream bitStream = new UInt8_NE_L_OutputBitStream(output);
             MemoryStream data = new MemoryStream();
