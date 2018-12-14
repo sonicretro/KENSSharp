@@ -148,7 +148,7 @@
                 long length = node_meta_array[next_index].match_length;
                 long distance = next_index - node_meta_array[next_index].match_length - node_meta_array[next_index].match_offset;
 
-                if (node_meta_array[next_index].match_length != 0)
+                if (length != 0)
                 {
                     if (length >= 2 && length <= 5 && distance <= 256)
                     {
