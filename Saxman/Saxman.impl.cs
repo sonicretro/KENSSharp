@@ -4,17 +4,29 @@
     using System.Collections.Generic;
     using System.IO;
 
-    struct LZSSNodeMeta
-    {
-        public long cost;
-        public long next_node_index;
-        public long previous_node_index;
-        public long match_length;
-        public long match_offset;
-    };
-
     public static partial class Saxman
     {
+        private struct LZSSNodeMeta
+        {
+            public long cost;
+            public long next_node_index;
+            public long previous_node_index;
+            public long match_length;
+            public long match_offset;
+        };
+
+        private const long max_match_length = 0xF + 3;
+        private const long max_match_distance = 0x1000;
+        private const long literal_cost = 1 + 8;
+
+        private static long GetMatchCost(long distance, long length)
+        {
+            if (length >= 3)
+                return 1 + 16;
+            else
+                return 0;
+        }
+
         private static void Encode(Stream input, Stream output, bool with_size)
         {
             long input_size = input.Length - input.Position;
@@ -38,23 +50,24 @@
 
             for (long i = 0; i < input_size; ++i)
             {
-                long max_read_ahead = Math.Min(0xF + 3, input_size - i);
-                long max_read_behind = 0x1000 > i ? 0 : i - 0x1000;
+                long max_read_ahead = Math.Min(max_match_length, input_size - i);
+                long max_read_behind = max_match_distance > i ? 0 : i - max_match_distance;
 
-                if (i < 0x1000)
+                // Find zero-fill matches
+                if (i < max_match_distance)
                 {
                     for (long k = 0; k < max_read_ahead; ++k)
                     {
                         if (input_buffer[i + k] == 0)
                         {
-                            long cost = (k + 1 >= 3) ? 1 + 16 : 0;
+                            long cost = GetMatchCost(0, k + 1);
 
                             if (cost != 0 && node_meta_array[i + k + 1].cost > node_meta_array[i].cost + cost)
                             {
                                 node_meta_array[i + k + 1].cost = node_meta_array[i].cost + cost;
                                 node_meta_array[i + k + 1].previous_node_index = i;
                                 node_meta_array[i + k + 1].match_length = k + 1;
-                                node_meta_array[i + k + 1].match_offset = 0xFFF;
+                                node_meta_array[i + k + 1].match_offset = max_match_distance - 1;
                             }
                         }
                         else
@@ -68,7 +81,7 @@
                     {
                         if (input_buffer[i + k] == input_buffer[j + k])
                         {
-                            long cost = (k + 1 >= 3) ? 1 + 16 : 0;
+                            long cost = GetMatchCost(i - j, k + 1);
 
                             if (cost != 0 && node_meta_array[i + k + 1].cost > node_meta_array[i].cost + cost)
                             {
@@ -83,9 +96,9 @@
                     }
                 }
 
-                if (node_meta_array[i + 1].cost >= node_meta_array[i].cost + 1 + 8)
+                if (node_meta_array[i + 1].cost >= node_meta_array[i].cost + literal_cost)
                 {
-                    node_meta_array[i + 1].cost = node_meta_array[i].cost + 1 + 8;
+                    node_meta_array[i + 1].cost = node_meta_array[i].cost + literal_cost;
                     node_meta_array[i + 1].previous_node_index = i;
                     node_meta_array[i + 1].match_length = 0;
                 }
