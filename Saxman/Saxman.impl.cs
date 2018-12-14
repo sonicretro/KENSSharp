@@ -40,7 +40,7 @@
             }
 
             UInt8_NE_L_OutputBitStream bitStream = new UInt8_NE_L_OutputBitStream(output);
-            List<byte> data = new List<byte>();
+            MemoryStream data = new MemoryStream();
 
             LZSSNodeMeta[] node_meta_array = new LZSSNodeMeta[input_size + 1];
 
@@ -118,14 +118,14 @@
                     // Compressed
                     Push(bitStream, false, output, data);
                     long match_offset_adjusted = node_meta_array[next_index].match_offset - 0x12;   // I don't think there's any reason for this, the format's just stupid
-                    data.Add((byte)(match_offset_adjusted & 0xFF));
-                    data.Add((byte)(((match_offset_adjusted & 0xF00) >> 4) | ((node_meta_array[next_index].match_length - 3) & 0x0F)));
+                    NeutralEndian.Write1(data, (byte)(match_offset_adjusted & 0xFF));
+                    NeutralEndian.Write1(data, (byte)(((match_offset_adjusted & 0xF00) >> 4) | ((node_meta_array[next_index].match_length - 3) & 0x0F)));
                 }
                 else
                 {
                     // Uncompressed
                     Push(bitStream, true, output, data);
-                    data.Add(input_buffer[node_index]);
+                    NeutralEndian.Write1(data, input_buffer[node_index]);
                 }
             }
 
@@ -142,13 +142,13 @@
             }
         }
 
-        private static void Push(UInt8_NE_L_OutputBitStream bitStream, bool bit, Stream destination, List<byte> data)
+        private static void Push(UInt8_NE_L_OutputBitStream bitStream, bool bit, Stream destination, MemoryStream data)
         {
             if (bitStream.Push(bit))
             {
                 byte[] bytes = data.ToArray();
                 destination.Write(bytes, 0, bytes.Length);
-                data.Clear();
+                data.SetLength(0);
             }
         }
 
