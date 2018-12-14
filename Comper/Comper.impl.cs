@@ -26,15 +26,12 @@
 
         internal static void Encode(Stream source, Stream destination)
         {
-            long size = source.Length - source.Position;
-            byte[] buffer = new byte[size + (size & 1)];
-            source.Read(buffer, 0, (int)size);
+            long size_bytes = source.Length - source.Position;
+            byte[] buffer = new byte[size_bytes + (size_bytes & 1)];
+            source.Read(buffer, 0, (int)size_bytes);
 
-            EncodeInternal(destination, buffer, size / 2);
-        }
+            long size = (size_bytes + 1) / 2;
 
-        private static void EncodeInternal(Stream destination, byte[] buffer, long size)
-        {
             UInt16BE_NE_H_OutputBitStream bitStream = new UInt16BE_NE_H_OutputBitStream(destination);
             MemoryStream data = new MemoryStream();
 

@@ -39,8 +39,8 @@
                 output.Seek(2, SeekOrigin.Current);
             }
 
-            List<byte> data = new List<byte>();
             UInt8_NE_L_OutputBitStream bitStream = new UInt8_NE_L_OutputBitStream(output);
+            List<byte> data = new List<byte>();
 
             LZSSNodeMeta[] node_meta_array = new LZSSNodeMeta[input_size + 1];
 
