@@ -5,18 +5,10 @@
 
     public static partial class Kosinski
     {
-        private struct LZSSNodeMeta
+        private static void FindExtraMatches(byte[] data, long data_size, long offset, LZSS.NodeMeta[] node_meta_array)
         {
-            public long cost;
-            public long next_node_index;
-            public long previous_node_index;
-            public long match_length;
-            public long match_offset;
-        };
-
-        private const long max_match_length = 0x100;
-        private const long max_match_distance = 0x2000;
-        private const long literal_cost = 1 + 8;
+            // Kosinski has no special matches
+        }
 
         private static long GetMatchCost(long distance, long length)
         {
@@ -93,53 +85,10 @@
 
         private static void EncodeInternal(Stream destination, byte[] buffer, long pos, long size)
         {
+            LZSS.NodeMeta[] node_meta_array = LZSS.FindMatches(buffer, size, 0x100, 0x2000, FindExtraMatches, 1 + 8, GetMatchCost);
+
             UInt16LE_E_L_OutputBitStream bitStream = new UInt16LE_E_L_OutputBitStream(destination);
             MemoryStream data = new MemoryStream();
-
-            LZSSNodeMeta[] node_meta_array = new LZSSNodeMeta[size + 1];
-
-            node_meta_array[0].cost = 0;
-            for (long i = 1; i < size + 1; ++i)
-                node_meta_array[i].cost = long.MaxValue;
-
-            for (long i = 0; i < size; ++i)
-            {
-                long max_read_ahead = Math.Min(max_match_length, size - i);
-                long max_read_behind = max_match_distance > i ? 0 : i - max_match_distance;
-
-                for (long j = i; j-- > max_read_behind;)
-                {
-                    for (long k = 0; k < max_read_ahead; ++k)
-                    {
-                        if (buffer[pos + i + k] == buffer[pos + j + k])
-                        {
-                            long cost = GetMatchCost(i - j, k + 1);
-
-                            if (cost != 0 && node_meta_array[i + k + 1].cost > node_meta_array[i].cost + cost)
-                            {
-                                node_meta_array[i + k + 1].cost = node_meta_array[i].cost + cost;
-                                node_meta_array[i + k + 1].previous_node_index = i;
-                                node_meta_array[i + k + 1].match_length = k + 1;
-                                node_meta_array[i + k + 1].match_offset = j;
-                            }
-                        }
-                        else
-                            break;
-                    }
-                }
-
-                if (node_meta_array[i + 1].cost >= node_meta_array[i].cost + literal_cost)
-                {
-                    node_meta_array[i + 1].cost = node_meta_array[i].cost + literal_cost;
-                    node_meta_array[i + 1].previous_node_index = i;
-                    node_meta_array[i + 1].match_length = 0;
-                }
-            }
-
-            node_meta_array[0].previous_node_index = long.MaxValue;
-            node_meta_array[size].next_node_index = long.MaxValue;
-            for (long node_index = size; node_meta_array[node_index].previous_node_index != long.MaxValue; node_index = node_meta_array[node_index].previous_node_index)
-                node_meta_array[node_meta_array[node_index].previous_node_index].next_node_index = node_index;
 
             for (long node_index = 0; node_meta_array[node_index].next_node_index != long.MaxValue; node_index = node_meta_array[node_index].next_node_index)
             {

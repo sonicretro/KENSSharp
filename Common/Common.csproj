@@ -35,6 +35,7 @@
     <Compile Include="BigEndian.cs" />
     <Compile Include="CompressionException.cs" />
     <Compile Include="Endianness.cs" />
+    <Compile Include="LZSS.cs" />
     <Compile Include="UInt16BE_NE_H_InputBitStream.cs" />
     <Compile Include="UInt16BE_E_L_InputBitStream.cs" />
     <Compile Include="UInt16BE_NE_H_OutputBitStream.cs" />

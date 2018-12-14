@@ -1,23 +1,34 @@
 ﻿namespace SonicRetro.KensSharp
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
 
     public static partial class Saxman
     {
-        private struct LZSSNodeMeta
+        private static void FindExtraMatches(byte[] data, long data_size, long offset, LZSS.NodeMeta[] node_meta_array)
         {
-            public long cost;
-            public long next_node_index;
-            public long previous_node_index;
-            public long match_length;
-            public long match_offset;
-        };
+            // Find zero-fill matches
+            if (offset < 0x1000)
+            {
+                for (long k = 0; k < 0xF + 3; ++k)
+                {
+                    if (data[offset + k] == 0)
+                    {
+                        long cost = GetMatchCost(0, k + 1);
 
-        private const long max_match_length = 0xF + 3;
-        private const long max_match_distance = 0x1000;
-        private const long literal_cost = 1 + 8;
+                        if (cost != 0 && node_meta_array[offset + k + 1].cost > node_meta_array[offset].cost + cost)
+                        {
+                            node_meta_array[offset + k + 1].cost = node_meta_array[offset].cost + cost;
+                            node_meta_array[offset + k + 1].previous_node_index = offset;
+                            node_meta_array[offset + k + 1].match_length = k + 1;
+                            node_meta_array[offset + k + 1].match_offset = 0xFFF;
+                        }
+                    }
+                    else
+                        break;
+                }
+            }
+        }
 
         private static long GetMatchCost(long distance, long length)
         {
@@ -39,75 +50,10 @@
                 output.Seek(2, SeekOrigin.Current);
             }
 
+            LZSS.NodeMeta[] node_meta_array = LZSS.FindMatches(input_buffer, input_size, 0xF + 3, 0x1000, FindExtraMatches, 1 + 8, GetMatchCost);
+
             UInt8_NE_L_OutputBitStream bitStream = new UInt8_NE_L_OutputBitStream(output);
             MemoryStream data = new MemoryStream();
-
-            LZSSNodeMeta[] node_meta_array = new LZSSNodeMeta[input_size + 1];
-
-            node_meta_array[0].cost = 0;
-            for (long i = 1; i < input_size + 1; ++i)
-                node_meta_array[i].cost = long.MaxValue;
-
-            for (long i = 0; i < input_size; ++i)
-            {
-                long max_read_ahead = Math.Min(max_match_length, input_size - i);
-                long max_read_behind = max_match_distance > i ? 0 : i - max_match_distance;
-
-                // Find zero-fill matches
-                if (i < max_match_distance)
-                {
-                    for (long k = 0; k < max_read_ahead; ++k)
-                    {
-                        if (input_buffer[i + k] == 0)
-                        {
-                            long cost = GetMatchCost(0, k + 1);
-
-                            if (cost != 0 && node_meta_array[i + k + 1].cost > node_meta_array[i].cost + cost)
-                            {
-                                node_meta_array[i + k + 1].cost = node_meta_array[i].cost + cost;
-                                node_meta_array[i + k + 1].previous_node_index = i;
-                                node_meta_array[i + k + 1].match_length = k + 1;
-                                node_meta_array[i + k + 1].match_offset = max_match_distance - 1;
-                            }
-                        }
-                        else
-                            break;
-                    }
-                }
-
-                for (long j = i; j-- > max_read_behind;)
-                {
-                    for (long k = 0; k < max_read_ahead; ++k)
-                    {
-                        if (input_buffer[i + k] == input_buffer[j + k])
-                        {
-                            long cost = GetMatchCost(i - j, k + 1);
-
-                            if (cost != 0 && node_meta_array[i + k + 1].cost > node_meta_array[i].cost + cost)
-                            {
-                                node_meta_array[i + k + 1].cost = node_meta_array[i].cost + cost;
-                                node_meta_array[i + k + 1].previous_node_index = i;
-                                node_meta_array[i + k + 1].match_length = k + 1;
-                                node_meta_array[i + k + 1].match_offset = j;
-                            }
-                        }
-                        else
-                            break;
-                    }
-                }
-
-                if (node_meta_array[i + 1].cost >= node_meta_array[i].cost + literal_cost)
-                {
-                    node_meta_array[i + 1].cost = node_meta_array[i].cost + literal_cost;
-                    node_meta_array[i + 1].previous_node_index = i;
-                    node_meta_array[i + 1].match_length = 0;
-                }
-            }
-
-            node_meta_array[0].previous_node_index = long.MaxValue;
-            node_meta_array[input_size].next_node_index = long.MaxValue;
-            for (long node_index = input_size; node_meta_array[node_index].previous_node_index != long.MaxValue; node_index = node_meta_array[node_index].previous_node_index)
-                node_meta_array[node_meta_array[node_index].previous_node_index].next_node_index = node_index;
 
             for (long node_index = 0; node_meta_array[node_index].next_node_index != long.MaxValue; node_index = node_meta_array[node_index].next_node_index)
             {
@@ -151,6 +97,7 @@
                 data.SetLength(0);
             }
         }
+
 
         private static void Decode(Stream input, Stream output)
         {
