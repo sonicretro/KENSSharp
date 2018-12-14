@@ -4,6 +4,15 @@
     using System.Collections.Generic;
     using System.IO;
 
+    struct LZSSNodeMeta
+    {
+        public long cost;
+        public long next_node_index;
+        public long previous_node_index;
+        public long match_length;
+        public long match_offset;
+    };
+
     public static partial class Saxman
     {
         private static void Encode(Stream input, Stream output, bool with_size)
@@ -21,69 +30,92 @@
             List<byte> data = new List<byte>();
             UInt8_NE_L_OutputBitStream bitStream = new UInt8_NE_L_OutputBitStream(output);
 
-            long input_pointer = 0;
-            while (input_pointer < input_size)
+            LZSSNodeMeta[] node_meta_array = new LZSSNodeMeta[input_size + 1];
+
+            node_meta_array[0].cost = 0;
+            for (long i = 1; i < input_size + 1; ++i)
+                node_meta_array[i].cost = long.MaxValue;
+
+            for (long i = 0; i < input_size; ++i)
             {
-                // The maximum recurrence length that can be encoded is 0x12
-                // Of course, if the remaining file is smaller, cap to that instead
-                long maximum_match_length = Math.Min(input_size - input_pointer, 0x12);
-                // The furthest back Saxman can address is 0x1000 bytes
-                // Again, if there's less than 0x1000 bytes of data available, then cap at that instead
-                long maximum_backsearch = Math.Min(input_pointer, 0x1000);
+                long max_read_ahead = Math.Min(0xF + 3, input_size - i);
+                long max_read_behind = 0x1000 > i ? 0 : i - 0x1000;
 
-                // These are our default values for the longest match found
-                long longest_match_offset = input_pointer;	// This one doesn't really need initialising, but it does shut up some moronic warnings
-                long longest_match_length = 1;
-
-                // First, look for dictionary matches
-                for (long backsearch_pointer = input_pointer - 1; backsearch_pointer >= input_pointer - maximum_backsearch; --backsearch_pointer)
+                if (i < 0x1000)
                 {
-                    long match_length = 0;
-                    while (input_buffer[backsearch_pointer + match_length] == input_buffer[input_pointer + match_length] && ++match_length < maximum_match_length) ;
-
-                    if (match_length > longest_match_length)
+                    for (long k = 0; k < max_read_ahead; ++k)
                     {
-                        longest_match_length = match_length;
-                        longest_match_offset = backsearch_pointer;
+                        if (input_buffer[i + k] == 0)
+                        {
+                            long cost = (k + 1 >= 3) ? 1 + 16 : 0;
+
+                            if (cost != 0 && node_meta_array[i + k + 1].cost > node_meta_array[i].cost + cost)
+                            {
+                                node_meta_array[i + k + 1].cost = node_meta_array[i].cost + cost;
+                                node_meta_array[i + k + 1].previous_node_index = i;
+                                node_meta_array[i + k + 1].match_length = k + 1;
+                                node_meta_array[i + k + 1].match_offset = 0xFFF;
+                            }
+                        }
+                        else
+                            break;
                     }
                 }
 
-                // Then, look for zero-fill matches
-                if (input_pointer < 0xFFF)  // Saxman cannot perform zero-fills past the first 0xFFF bytes (it relies on some goofy logic in the decompressor)
+                for (long j = i; j-- > max_read_behind;)
                 {
-                    long match_length = 0;
-                    while (input_buffer[input_pointer + match_length] == 0 && ++match_length < maximum_match_length) ;
-
-                    if (match_length > longest_match_length)
+                    for (long k = 0; k < max_read_ahead; ++k)
                     {
-                        longest_match_length = match_length;
-                        // Saxman detects zero-fills by checking if the dictionary reference offset is somehow
-                        // pointing to *after* the decompressed data, so we set it to the highest possible value here
-                        longest_match_offset = 0xFFF;
+                        if (input_buffer[i + k] == input_buffer[j + k])
+                        {
+                            long cost = (k + 1 >= 3) ? 1 + 16 : 0;
+
+                            if (cost != 0 && node_meta_array[i + k + 1].cost > node_meta_array[i].cost + cost)
+                            {
+                                node_meta_array[i + k + 1].cost = node_meta_array[i].cost + cost;
+                                node_meta_array[i + k + 1].previous_node_index = i;
+                                node_meta_array[i + k + 1].match_length = k + 1;
+                                node_meta_array[i + k + 1].match_offset = j;
+                            }
+                        }
+                        else
+                            break;
                     }
                 }
 
-                // We cannot compress runs shorter than three bytes
-                if (longest_match_length < 3)
+                if (node_meta_array[i + 1].cost >= node_meta_array[i].cost + 1 + 8)
                 {
-                    // Uncompressed
-                    Push(bitStream, true, output, data);
-                    data.Add(input_buffer[input_pointer]);
-
-                    longest_match_length = 1;
+                    node_meta_array[i + 1].cost = node_meta_array[i].cost + 1 + 8;
+                    node_meta_array[i + 1].previous_node_index = i;
+                    node_meta_array[i + 1].match_length = 0;
                 }
-                else
+            }
+
+            node_meta_array[0].previous_node_index = long.MaxValue;
+            node_meta_array[input_size].next_node_index = long.MaxValue;
+            for (long node_index = input_size; node_meta_array[node_index].previous_node_index != long.MaxValue; node_index = node_meta_array[node_index].previous_node_index)
+                node_meta_array[node_meta_array[node_index].previous_node_index].next_node_index = node_index;
+
+            for (long node_index = 0; node_meta_array[node_index].next_node_index != long.MaxValue; node_index = node_meta_array[node_index].next_node_index)
+            {
+                long next_index = node_meta_array[node_index].next_node_index;
+
+                if (node_meta_array[next_index].match_length != 0)
                 {
                     // Compressed
                     Push(bitStream, false, output, data);
-                    long match_offset_adjusted = longest_match_offset - 0x12;   // I don't think there's any reason for this, the format's just stupid
+                    long match_offset_adjusted = node_meta_array[next_index].match_offset - 0x12;   // I don't think there's any reason for this, the format's just stupid
                     data.Add((byte)(match_offset_adjusted & 0xFF));
-                    data.Add((byte)(((match_offset_adjusted & 0xF00) >> 4) | ((longest_match_length - 3) & 0x0F)));
+                    data.Add((byte)(((match_offset_adjusted & 0xF00) >> 4) | ((node_meta_array[next_index].match_length - 3) & 0x0F)));
                 }
-
-                input_pointer += longest_match_length;
+                else
+                {
+                    // Uncompressed
+                    Push(bitStream, true, output, data);
+                    data.Add(input_buffer[node_index]);
+                }
             }
-            
+
             // Write remaining data (normally we don't flush until we have a full descriptor byte)
             bitStream.Flush(true);
             byte[] dataArray = data.ToArray();
