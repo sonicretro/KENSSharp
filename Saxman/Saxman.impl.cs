@@ -82,7 +82,7 @@
 
             if (with_size)
             {
-                ushort size = (ushort)(output.Position - 2);
+                ushort size = (ushort)(outputInitialPosition - output.Position - 2);
                 output.Seek(outputInitialPosition, SeekOrigin.Begin);
                 LittleEndian.Write2(output, size);
             }
