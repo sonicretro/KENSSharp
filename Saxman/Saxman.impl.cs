@@ -5,16 +5,16 @@
 
     public static partial class Saxman
     {
-        private static void FindExtraMatches(byte[] data, long pos, long data_size, long offset, LZSS.NodeMeta[] node_meta_array)
+        private static void FindExtraMatches(byte[] data, int pos, int data_size, int offset, LZSS.NodeMeta[] node_meta_array)
         {
             // Find zero-fill matches
             if (offset < 0x1000)
             {
-                for (long k = 0; k < 0xF + 3; ++k)
+                for (int k = 0; k < 0xF + 3; ++k)
                 {
                     if (data[pos + offset + k] == 0)
                     {
-                        long cost = GetMatchCost(0, k + 1);
+						int cost = GetMatchCost(0, k + 1);
 
                         if (cost != 0 && node_meta_array[offset + k + 1].cost > node_meta_array[offset].cost + cost)
                         {
@@ -30,7 +30,7 @@
             }
         }
 
-        private static long GetMatchCost(long distance, long length)
+        private static int GetMatchCost(int distance, int length)
         {
             if (length >= 3)
                 return 1 + 16;
@@ -40,9 +40,9 @@
 
         private static void Encode(Stream input, Stream output, bool with_size)
         {
-            long input_size = input.Length - input.Position;
+			int input_size = (int)(input.Length - input.Position);
             byte[] input_buffer = new byte[input_size];
-            input.Read(input_buffer, 0, (int)input_size);
+            input.Read(input_buffer, 0, input_size);
 
             long outputInitialPosition = output.Position;
             if (with_size)
@@ -55,15 +55,15 @@
             UInt8_NE_L_OutputBitStream bitStream = new UInt8_NE_L_OutputBitStream(output);
             MemoryStream data = new MemoryStream();
 
-            for (long node_index = 0; node_meta_array[node_index].next_node_index != long.MaxValue; node_index = node_meta_array[node_index].next_node_index)
+            for (int node_index = 0; node_meta_array[node_index].next_node_index != int.MaxValue; node_index = node_meta_array[node_index].next_node_index)
             {
-                long next_index = node_meta_array[node_index].next_node_index;
+				int next_index = node_meta_array[node_index].next_node_index;
 
                 if (node_meta_array[next_index].match_length != 0)
                 {
                     // Compressed
                     Push(bitStream, false, output, data);
-                    long match_offset_adjusted = node_meta_array[next_index].match_offset - 0x12;   // I don't think there's any reason for this, the format's just stupid
+					int match_offset_adjusted = node_meta_array[next_index].match_offset - 0x12;   // I don't think there's any reason for this, the format's just stupid
                     NeutralEndian.Write1(data, (byte)(match_offset_adjusted & 0xFF));
                     NeutralEndian.Write1(data, (byte)(((match_offset_adjusted & 0xF00) >> 4) | ((node_meta_array[next_index].match_length - 3) & 0x0F)));
                 }

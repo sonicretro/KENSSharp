@@ -5,12 +5,12 @@
 
     public static partial class Kosinski
     {
-        private static void FindExtraMatches(byte[] data, long pos, long data_size, long offset, LZSS.NodeMeta[] node_meta_array)
+        private static void FindExtraMatches(byte[] data, int pos, int data_size, int offset, LZSS.NodeMeta[] node_meta_array)
         {
             // Kosinski has no special matches
         }
 
-        private static long GetMatchCost(long distance, long length)
+        private static int GetMatchCost(int distance, int length)
         {
             if (length >= 2 && length <= 5 && distance <= 256)
                 return 2 + 2 + 8;   // Descriptor bits, length bits, offset byte
@@ -24,27 +24,27 @@
 
         internal static void Encode(Stream source, Stream destination)
         {
-            long size = source.Length - source.Position;
+			int size = (int)(source.Length - source.Position);
             byte[] buffer = new byte[size];
-            source.Read(buffer, 0, (int)size);
+            source.Read(buffer, 0, size);
 
             EncodeInternal(destination, buffer, 0, size);
         }
 
         internal static void Encode(Stream source, Stream destination, Endianness headerEndianness)
         {
-            long size = source.Length - source.Position;
+            int size = (int)(source.Length - source.Position);
             byte[] buffer = new byte[size];
-            source.Read(buffer, 0, (int)size);
+            source.Read(buffer, 0, size);
 
-            long pos = 0;
+            int pos = 0;
             if (size > 0xffff)
             {
                 throw new CompressionException(Properties.Resources.KosinskiTotalSizeTooLarge);
             }
 
-            long remainingSize = size;
-            long compBytes = 0;
+			int remainingSize = size;
+			int compBytes = 0;
 
             if (remainingSize > 0x1000)
             {
@@ -79,23 +79,23 @@
                     destination.WriteByte(0);
                 }
 
-                remainingSize = Math.Min(0x1000L, size - compBytes);
+                remainingSize = Math.Min(0x1000, size - compBytes);
             }
         }
 
-        private static void EncodeInternal(Stream destination, byte[] buffer, long pos, long size)
+        private static void EncodeInternal(Stream destination, byte[] buffer, int pos, int size)
         {
             LZSS.NodeMeta[] node_meta_array = LZSS.FindMatches(buffer, pos, size, 0x100, 0x2000, FindExtraMatches, 1 + 8, GetMatchCost);
 
             UInt16LE_E_L_OutputBitStream bitStream = new UInt16LE_E_L_OutputBitStream(destination);
             MemoryStream data = new MemoryStream();
 
-            for (long node_index = 0; node_meta_array[node_index].next_node_index != long.MaxValue; node_index = node_meta_array[node_index].next_node_index)
+            for (int node_index = 0; node_meta_array[node_index].next_node_index != int.MaxValue; node_index = node_meta_array[node_index].next_node_index)
             {
-                long next_index = node_meta_array[node_index].next_node_index;
+				int next_index = node_meta_array[node_index].next_node_index;
 
-                long length = node_meta_array[next_index].match_length;
-                long distance = next_index - node_meta_array[next_index].match_length - node_meta_array[next_index].match_offset;
+				int length = node_meta_array[next_index].match_length;
+				int distance = next_index - node_meta_array[next_index].match_length - node_meta_array[next_index].match_offset;
 
                 if (length != 0)
                 {
