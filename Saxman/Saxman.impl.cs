@@ -1,46 +1,23 @@
 ﻿namespace SonicRetro.KensSharp
 {
-    using System.Collections.Generic;
+    using System;
     using System.IO;
+    using System.Collections.Generic;
 
     public static partial class Saxman
     {
-        private static void FindExtraMatches(byte[] data, int pos, int data_size, int offset, LZSS.NodeMeta[] node_meta_array)
+        private struct LZSSGraphEdge
         {
-            // Find zero-fill matches
-            if (offset < 0x1000)
-            {
-                for (int k = 0; k < 0xF + 3; ++k)
-                {
-                    if (data[pos + offset + k] == 0)
-                    {
-						int cost = GetMatchCost(0, k + 1);
-
-                        if (cost != 0 && node_meta_array[offset + k + 1].cost > node_meta_array[offset].cost + cost)
-                        {
-                            node_meta_array[offset + k + 1].cost = node_meta_array[offset].cost + cost;
-                            node_meta_array[offset + k + 1].previous_node_index = offset;
-                            node_meta_array[offset + k + 1].match_length = k + 1;
-                            node_meta_array[offset + k + 1].match_offset = 0xFFF;
-                        }
-                    }
-                    else
-                        break;
-                }
-            }
-        }
-
-        private static int GetMatchCost(int distance, int length)
-        {
-            if (length >= 3)
-                return 1 + 16;
-            else
-                return 0;
-        }
+            public int cost;
+            public int next_node_index;
+            public int previous_node_index;
+            public int match_length;
+            public int match_offset;
+        };
 
         private static void Encode(Stream input, Stream output, bool with_size)
         {
-			int input_size = (int)(input.Length - input.Position);
+            int input_size = (int)(input.Length - input.Position);
             byte[] input_buffer = new byte[input_size];
             input.Read(input_buffer, 0, input_size);
 
@@ -50,20 +27,114 @@
                 output.Seek(2, SeekOrigin.Current);
             }
 
-            LZSS.NodeMeta[] node_meta_array = LZSS.FindMatches(input_buffer, 0, input_size, 0xF + 3, 0x1000, FindExtraMatches, 1 + 8, GetMatchCost);
+            /*
+             * Here we create and populate the "LZSS graph":
+             * 
+             * Each value in the uncompressed file forms a node in this graph.
+             * The various edges between these nodes represent LZSS matches.
+             * 
+             * Using a shortest-path algorithm, these edges can be used to
+             * find the optimal combination of matches needed to produce the
+             * smallest possible file.
+             * 
+             * The outputted array only contains one edge per node: the optimal
+             * one. This means, in order to produce the smallest file, you just
+             * have to traverse the graph from one edge to the next, encoding
+             * each match as you go along.
+            */
+
+            LZSSGraphEdge[] node_meta_array = new LZSSGraphEdge[input_size + 1];
+
+            // Initialise the array
+            node_meta_array[0].cost = 0;
+            for (int i = 1; i < input_size + 1; ++i)
+                node_meta_array[i].cost = int.MaxValue;
+
+            // Find matches
+            for (int i = 0; i < input_size; ++i)
+            {
+                int max_read_ahead = Math.Min(0xF + 3, input_size - i);
+                int max_read_behind = Math.Max(0, i - 0x1000);
+
+                // Search for zero-fill matches
+                if (i < 0x1000)
+                {
+                    for (int k = 0; k < 0xF + 3; ++k)
+                    {
+                        if (input_buffer[i + k] == 0)
+                        {
+                            int length = k + 1;
+
+                            // Update this node's optimal edge if this one is better
+                            if (length >= 3 && node_meta_array[i + k + 1].cost > node_meta_array[i].cost + 1 + 16)
+                            {
+                                node_meta_array[i + k + 1].cost = node_meta_array[i].cost + 1 + 16;
+                                node_meta_array[i + k + 1].previous_node_index = i;
+                                node_meta_array[i + k + 1].match_length = k + 1;
+                                node_meta_array[i + k + 1].match_offset = 0xFFF;
+                            }
+                        }
+                        else
+                            break;
+                    }
+                }
+
+                // Search for dictionary matches
+                for (int j = i; j-- > max_read_behind;)
+                {
+                    for (int k = 0; k < max_read_ahead; ++k)
+                    {
+                        if (input_buffer[i + k] == input_buffer[j + k])
+                        {
+                            int distance = i - j;
+                            int length = k + 1;
+
+                            // Update this node's optimal edge if this one is better
+                            if (length >= 3 && node_meta_array[i + k + 1].cost > node_meta_array[i].cost + 1 + 16)
+                            {
+                                node_meta_array[i + k + 1].cost = node_meta_array[i].cost + 1 + 16;
+                                node_meta_array[i + k + 1].previous_node_index = i;
+                                node_meta_array[i + k + 1].match_length = k + 1;
+                                node_meta_array[i + k + 1].match_offset = j;
+                            }
+                        }
+                        else
+                            break;
+                    }
+                }
+
+                // Do literal match
+                // Update this node's optimal edge if this one is better (or the same, since literal matches usually decode faster)
+                if (node_meta_array[i + 1].cost >= node_meta_array[i].cost + 1 + 8)
+                {
+                    node_meta_array[i + 1].cost = node_meta_array[i].cost + 1 + 8;
+                    node_meta_array[i + 1].previous_node_index = i;
+                    node_meta_array[i + 1].match_length = 0;
+                }
+            }
+
+            // Reverse the edge link order, so the array can be traversed from start to end, rather than vice versa
+            node_meta_array[0].previous_node_index = int.MaxValue;
+            node_meta_array[input_size].next_node_index = int.MaxValue;
+            for (int node_index = input_size; node_meta_array[node_index].previous_node_index != int.MaxValue; node_index = node_meta_array[node_index].previous_node_index)
+                node_meta_array[node_meta_array[node_index].previous_node_index].next_node_index = node_index;
+
+            /*
+             * LZSS graph complete
+             */
 
             UInt8_NE_L_OutputBitStream bitStream = new UInt8_NE_L_OutputBitStream(output);
             MemoryStream data = new MemoryStream();
 
             for (int node_index = 0; node_meta_array[node_index].next_node_index != int.MaxValue; node_index = node_meta_array[node_index].next_node_index)
             {
-				int next_index = node_meta_array[node_index].next_node_index;
+                int next_index = node_meta_array[node_index].next_node_index;
 
                 if (node_meta_array[next_index].match_length != 0)
                 {
                     // Compressed
                     Push(bitStream, false, output, data);
-					int match_offset_adjusted = node_meta_array[next_index].match_offset - 0x12;   // I don't think there's any reason for this, the format's just stupid
+                    int match_offset_adjusted = node_meta_array[next_index].match_offset - 0x12;   // I don't think there's any reason for this, the format's just stupid
                     NeutralEndian.Write1(data, (byte)(match_offset_adjusted & 0xFF));
                     NeutralEndian.Write1(data, (byte)(((match_offset_adjusted & 0xF00) >> 4) | ((node_meta_array[next_index].match_length - 3) & 0x0F)));
                 }
